@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bellman-Ford Algorithm - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .project-title { font-size:2.8rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:1.5rem; line-height:1.2; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+        code { font-family:'Courier New', monospace; font-size:0.88em; background:rgba(152,113,133,0.1); padding:0.1rem 0.4rem; border-radius:2px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        .feature-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; }
+        .feature-list li { background-color:rgba(255,255,255,0.15); padding:1.2rem 1.5rem; border-radius:2px; font-size:0.95rem; color:#423736; font-weight:300; display:flex; align-items:flex-start; gap:0.8rem; }
+        .feature-list li::before { content:"—"; color:#987185; flex-shrink:0; }
+
+        .steps { display:flex; flex-direction:column; gap:0; }
+        .step { display:flex; align-items:flex-start; gap:1.5rem; position:relative; }
+        .step:not(:last-child)::after { content:''; position:absolute; left:1.1rem; top:3rem; bottom:-1rem; width:1px; background-color:rgba(152,113,133,0.25); }
+        .step-num { width:2.2rem; height:2.2rem; border-radius:50%; background-color:rgba(152,113,133,0.15); border:1px solid rgba(152,113,133,0.4); display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#987185; flex-shrink:0; margin-top:0.15rem; }
+        .step-body { padding-bottom:2rem; }
+        .step-title { font-size:0.95rem; color:#423736; font-weight:400; margin-bottom:0.3rem; }
+        .step-desc { font-size:0.88rem; color:#423736; opacity:0.7; font-weight:300; }
+
+        /* Compare cards */
+        .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+        .compare-card { background-color:rgba(255,255,255,0.15); padding:1.8rem; border-radius:2px; }
+        .compare-card h4 { font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:1rem; font-weight:400; }
+        .compare-card ul { list-style:none; }
+        .compare-card ul li { font-size:0.9rem; color:#423736; font-weight:300; padding:0.4rem 0; border-bottom:1px solid rgba(152,113,133,0.08); display:flex; gap:0.6rem; }
+        .compare-card ul li::before { content:"·"; color:#987185; }
+
+        .complexity-table { width:100%; border-collapse:collapse; }
+        .complexity-table th { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; font-weight:400; padding:0.8rem 1.2rem; text-align:left; border-bottom:1px solid rgba(152,113,133,0.2); }
+        .complexity-table td { padding:0.8rem 1.2rem; font-size:0.9rem; color:#423736; font-weight:300; font-family:'Courier New', monospace; border-bottom:1px solid rgba(152,113,133,0.08); }
+        .complexity-table tr { background-color:rgba(255,255,255,0.1); }
+        .complexity-table tr:hover { background-color:rgba(255,255,255,0.2); }
+
+        .code-block { background-color:#423736; border-radius:2px; padding:2rem; overflow-x:auto; }
+        .code-block pre { font-family:'Courier New', monospace; font-size:0.82rem; color:#F4E2D1; line-height:1.75; white-space:pre; }
+        .code-comment { color:#987185; }
+        .code-keyword { color:#D6AA9F; }
+        .code-string { color:#c8a97e; }
+        .code-type { color:#b8d4c8; }
+        .code-preproc { color:#c8a97e; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+        .project-nav .next { margin-left:auto; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:2rem; }
+            .compare-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <div class="project-header">
+            <div class="project-number">Project 09</div>
+            <h1 class="project-title">Bellman-Ford Algorithm Program</h1>
+            <div class="project-meta">
+                <span class="tech-tag">C</span>
+                <span class="tech-tag">Graph Algorithms</span>
+                <span class="tech-tag">Shortest Path</span>
+                <span class="tech-tag">Negative Weights</span>
+                <span class="tech-tag">Cycle Detection</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>Implementation of the Bellman-Ford shortest path algorithm in C, using an edge list representation. Unlike Dijkstra's algorithm, Bellman-Ford can handle graphs with <strong>negative edge weights</strong> and is also capable of <strong>detecting negative weight cycles</strong> — making it essential for applications such as network routing protocols (RIP), arbitrage detection in finance, and constraint graphs. The program computes shortest distances from a source vertex and reports if a negative cycle exists.</p>
+        </div>
+
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Language</div><div class="value">C</div></div>
+                <div class="info-card"><div class="label">Type</div><div class="value">Dynamic Relaxation</div></div>
+                <div class="info-card"><div class="label">Graph</div><div class="value">Directed, Weighted</div></div>
+                <div class="info-card"><div class="label">Representation</div><div class="value">Edge List</div></div>
+                <div class="info-card"><div class="label">Negative Weights</div><div class="value">Supported ✓</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Bellman-Ford vs Dijkstra</h2>
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <h4>Dijkstra</h4>
+                    <ul>
+                        <li>Greedy — picks min distance vertex</li>
+                        <li>O(V²) or O(E log V) with heap</li>
+                        <li>No negative edge weights</li>
+                        <li>No negative cycle detection</li>
+                        <li>Faster in practice</li>
+                    </ul>
+                </div>
+                <div class="compare-card">
+                    <h4>Bellman-Ford</h4>
+                    <ul>
+                        <li>Relaxation — iterates all edges V-1 times</li>
+                        <li>O(V × E) always</li>
+                        <li>Handles negative edge weights</li>
+                        <li>Detects negative cycles</li>
+                        <li>More versatile, used in RIP protocol</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">How the Algorithm Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <div class="step-title">Initialize distances</div>
+                        <div class="step-desc">Set <code>dist[source] = 0</code>, all other distances = ∞. Store predecessor array for path reconstruction.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <div class="step-title">Relax all edges — V−1 times</div>
+                        <div class="step-desc">For every edge (u, v, w): if <code>dist[u] + w &lt; dist[v]</code>, update <code>dist[v]</code>. After V−1 passes, all shortest paths are found.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <div class="step-title">Detect negative cycles</div>
+                        <div class="step-desc">Run one more pass over all edges. If any distance still decreases, a negative cycle exists — there is no finite shortest path.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-body">
+                        <div class="step-title">Output results</div>
+                        <div class="step-desc">Print shortest distance to each vertex and reconstruct each path through the predecessor array.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>Edge list representation — simpler than adjacency matrix for sparse graphs</li>
+                <li>Handles negative edge weights — a key advantage over Dijkstra</li>
+                <li>Negative cycle detection via an extra relaxation pass after V−1 iterations</li>
+                <li>Predecessor array to reconstruct the full shortest path to any vertex</li>
+                <li>Prints "No path" for vertices unreachable from the source</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Complexity Analysis</h2>
+            <table class="complexity-table">
+                <thead>
+                    <tr><th>Metric</th><th>Value</th><th>Note</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Time Complexity</td><td>O(V × E)</td><td>V−1 passes, each relaxes E edges</td></tr>
+                    <tr><td>Space Complexity</td><td>O(V + E)</td><td>Distance + predecessor + edge list</td></tr>
+                    <tr><td>Negative Weights</td><td>Supported</td><td>Unlike Dijkstra</td></tr>
+                    <tr><td>Negative Cycles</td><td>Detected</td><td>Extra V-th relaxation pass</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Core Implementation</h2>
+            <div class="code-block"><pre><span class="code-preproc">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+<span class="code-preproc">#include</span> <span class="code-string">&lt;limits.h&gt;</span>
+
+<span class="code-preproc">#define</span> MAX_V 100
+<span class="code-preproc">#define</span> MAX_E 500
+<span class="code-preproc">#define</span> INF   INT_MAX
+
+<span class="code-keyword">typedef struct</span> {
+    <span class="code-keyword">int</span> src, dest, weight;
+} <span class="code-type">Edge</span>;
+
+<span class="code-type">Edge</span>  edges[MAX_E];
+<span class="code-keyword">int</span>   dist[MAX_V], pred[MAX_V];
+<span class="code-keyword">int</span>   V, E;
+
+<span class="code-keyword">void</span> bellmanFord(<span class="code-keyword">int</span> source) {
+    <span class="code-comment">/* Step 1 — Initialize */</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i &lt; V; i++) { dist[i] = INF; pred[i] = -1; }
+    dist[source] = 0;
+
+    <span class="code-comment">/* Step 2 — Relax all edges V-1 times */</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i &lt; V - 1; i++) {
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j &lt; E; j++) {
+            <span class="code-keyword">int</span> u = edges[j].src, v = edges[j].dest, w = edges[j].weight;
+            <span class="code-keyword">if</span> (dist[u] != INF &amp;&amp; dist[u] + w &lt; dist[v]) {
+                dist[v] = dist[u] + w;
+                pred[v] = u;
+            }
+        }
+    }
+
+    <span class="code-comment">/* Step 3 — Detect negative weight cycle */</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j &lt; E; j++) {
+        <span class="code-keyword">int</span> u = edges[j].src, v = edges[j].dest, w = edges[j].weight;
+        <span class="code-keyword">if</span> (dist[u] != INF &amp;&amp; dist[u] + w &lt; dist[v]) {
+            printf(<span class="code-string">"⚠ Negative weight cycle detected — no solution.\n"</span>);
+            <span class="code-keyword">return</span>;
+        }
+    }
+
+    <span class="code-comment">/* Step 4 — Print results */</span>
+    printf(<span class="code-string">"Vertex\tDistance\tPath\n"</span>);
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i &lt; V; i++) {
+        <span class="code-keyword">if</span> (i == source) <span class="code-keyword">continue</span>;
+        <span class="code-keyword">if</span> (dist[i] == INF) { printf(<span class="code-string">"%d\tUnreachable\n"</span>, i); <span class="code-keyword">continue</span>; }
+        printf(<span class="code-string">"%d\t%d\t\t"</span>, i, dist[i]);
+        <span class="code-comment">/* Reconstruct path */</span>
+        <span class="code-keyword">int</span> path[MAX_V], len = 0, cur = i;
+        <span class="code-keyword">while</span> (cur != -1) { path[len++] = cur; cur = pred[cur]; }
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> k = len - 1; k &gt;= 0; k--)
+            printf(<span class="code-string">"%d%s"</span>, path[k], k ? <span class="code-string">" → "</span> : <span class="code-string">"\n"</span>);
+    }
+}
+
+<span class="code-keyword">int</span> main() {
+    printf(<span class="code-string">"Enter vertices and edges: "</span>); scanf(<span class="code-string">"%d %d"</span>, &amp;V, &amp;E);
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i &lt; E; i++)
+        scanf(<span class="code-string">"%d %d %d"</span>, &amp;edges[i].src, &amp;edges[i].dest, &amp;edges[i].weight);
+    <span class="code-keyword">int</span> src; printf(<span class="code-string">"Source vertex: "</span>); scanf(<span class="code-string">"%d"</span>, &amp;src);
+    bellmanFord(src);
+    <span class="code-keyword">return</span> 0;
+}</pre></div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>Implementing Bellman-Ford right after Dijkstra gave me a clear comparative understanding of when each algorithm is appropriate. The key insight was that Dijkstra's greedy approach breaks with negative weights, while Bellman-Ford's exhaustive edge relaxation guarantees correctness even then. The negative cycle detection step — running one extra relaxation pass and checking if any distance still improves — was a particularly elegant idea that deepened my appreciation of algorithm design.</p>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-dijkstra.html">← Project 08 — Dijkstra</a>
+            <a href="project-sorting-algorithms.html" class="next">Project 10 — Sorting Algorithms →</a>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>

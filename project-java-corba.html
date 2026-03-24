@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java CORBA - Kawther Bordjiba</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F4E2D1;
+            color: #423736;
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(66, 55, 54, 0.95);
+            padding: 0 3rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            color: #D6AA9F;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            font-weight: 400;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #F4E2D1;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav a:hover { color: #D6AA9F; }
+
+        .nav-cta {
+            padding: 0.45rem 1.2rem;
+            border: 1px solid #D6AA9F;
+            color: #D6AA9F !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 1.5px;
+            transition: all 0.3s !important;
+        }
+
+        .nav-cta:hover {
+            background-color: #D6AA9F;
+            color: #423736 !important;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 1.5px;
+            background-color: #F4E2D1;
+            transition: all 0.3s;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 8rem 3rem 5rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: transparent;
+            color: #423736;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border: 1px solid #423736;
+            margin-bottom: 3rem;
+        }
+
+        .back-button:hover {
+            background-color: #423736;
+            color: #F4E2D1;
+        }
+
+        /* ── HEADER ── */
+        .project-header {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid rgba(152, 113, 133, 0.2);
+            padding-bottom: 3rem;
+        }
+
+        .project-number {
+            font-size: 0.8rem;
+            color: #987185;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: #423736;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.9rem;
+            background-color: rgba(152, 113, 133, 0.15);
+            color: #987185;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* ── SECTIONS ── */
+        .section { margin-bottom: 3.5rem; }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 1.2rem;
+        }
+
+        .section p {
+            font-size: 1rem;
+            color: #423736;
+            font-weight: 300;
+            line-height: 1.9;
+            max-width: 750px;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.88em;
+            background: rgba(152,113,133,0.1);
+            padding: 0.1rem 0.4rem;
+            border-radius: 2px;
+        }
+
+        /* ── INFO GRID ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 1.5rem 1.8rem;
+            border-radius: 2px;
+        }
+
+        .info-card .label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card .value {
+            font-size: 0.95rem;
+            color: #423736;
+            font-weight: 300;
+        }
+
+        /* ── FEATURE LIST ── */
+        .feature-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-list li {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 1.2rem 1.5rem;
+            border-radius: 2px;
+            font-size: 0.95rem;
+            color: #423736;
+            font-weight: 300;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .feature-list li::before {
+            content: "—";
+            color: #987185;
+            flex-shrink: 0;
+        }
+
+        /* ── WORKFLOW STEPS ── */
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 1.1rem;
+            top: 3rem;
+            bottom: -1rem;
+            width: 1px;
+            background-color: rgba(152, 113, 133, 0.3);
+        }
+
+        .step-num {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            background-color: rgba(152, 113, 133, 0.15);
+            border: 1px solid rgba(152, 113, 133, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #987185;
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+
+        .step-body {
+            padding-bottom: 2rem;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            color: #423736;
+            font-weight: 400;
+            margin-bottom: 0.3rem;
+        }
+
+        .step-desc {
+            font-size: 0.88rem;
+            color: #423736;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        /* ── ARCHITECTURE ── */
+        .arch-diagram {
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            padding: 2.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .arch-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .arch-box {
+            background-color: rgba(66, 55, 54, 0.07);
+            border: 1px solid rgba(152, 113, 133, 0.3);
+            border-radius: 2px;
+            padding: 0.9rem 1.4rem;
+            min-width: 120px;
+        }
+
+        .arch-box.highlight {
+            border-color: rgba(152, 113, 133, 0.6);
+            background-color: rgba(152, 113, 133, 0.1);
+        }
+
+        .arch-box .arch-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 0.3rem;
+        }
+
+        .arch-box .arch-name {
+            font-size: 0.85rem;
+            color: #423736;
+            font-weight: 400;
+            font-family: 'Courier New', monospace;
+        }
+
+        .arch-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .arch-arrow .arr { font-size: 1.2rem; color: #987185; }
+        .arch-arrow .arr-label {
+            font-size: 0.62rem;
+            letter-spacing: 1px;
+            color: #987185;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .lang-badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .lang-java { background: rgba(214,170,159,0.25); color: #987185; }
+        .lang-c    { background: rgba(66,55,54,0.12);   color: #423736; }
+        .lang-idl  { background: rgba(152,113,133,0.2); color: #987185; }
+
+        /* ── TABS ── */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn {
+            padding: 0.55rem 1.1rem;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(152, 113, 133, 0.2);
+            border-bottom: none;
+            color: #987185;
+            font-size: 0.76rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .tab-btn:hover { background-color: rgba(255,255,255,0.2); }
+
+        .tab-btn.active {
+            background-color: #423736;
+            color: #F4E2D1;
+            border-color: #423736;
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background-color: #423736;
+            border-radius: 0 2px 2px 2px;
+            padding: 2rem;
+            overflow-x: auto;
+            border: 1px solid #423736;
+        }
+
+        .code-block pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            color: #F4E2D1;
+            line-height: 1.75;
+            white-space: pre;
+        }
+
+        .code-comment { color: #987185; }
+        .code-keyword { color: #D6AA9F; }
+        .code-string  { color: #c8a97e; }
+        .code-type    { color: #b8d4c8; }
+        .code-annot   { color: #9ec4b0; }
+        .code-preproc { color: #c8a97e; }
+
+        .code-panel { display: none; }
+        .code-panel.active { display: block; }
+
+        /* ── RMI vs CORBA ── */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .compare-card {
+            background-color: rgba(255,255,255,0.15);
+            padding: 1.8rem;
+            border-radius: 2px;
+        }
+
+        .compare-card h4 {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        .compare-card ul {
+            list-style: none;
+        }
+
+        .compare-card ul li {
+            font-size: 0.9rem;
+            color: #423736;
+            font-weight: 300;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(152,113,133,0.08);
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .compare-card ul li::before { content: "·"; color: #987185; }
+
+        /* ── PROJECT NAV ── */
+        .project-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(152, 113, 133, 0.2);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .project-nav a {
+            text-decoration: none;
+            color: #423736;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .project-nav a:hover { color: #987185; }
+        .project-nav .next { margin-left: auto; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 0 1.2rem; }
+            .hamburger { display: flex; }
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 60px; left: 0;
+                width: 100%;
+                background-color: rgba(66, 55, 54, 0.98);
+                flex-direction: column;
+                gap: 0; padding: 1rem 0;
+            }
+            nav ul.open { display: flex; }
+            nav ul li { width: 100%; text-align: center; }
+            nav a { display: block; padding: 0.9rem 1.5rem; font-size: 0.9rem; }
+            .nav-cta { margin: 0.5rem 2rem; }
+            .container { padding: 6rem 1.5rem 3rem; }
+            .project-title { font-size: 2rem; }
+            .arch-diagram { flex-direction: column; }
+            .compare-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html#about">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html#contact" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <!-- Header -->
+        <div class="project-header">
+            <div class="project-number">Project 03</div>
+            <h1 class="project-title">Java CORBA</h1>
+            <div class="project-meta">
+                <span class="tech-tag">Java</span>
+                <span class="tech-tag">C</span>
+                <span class="tech-tag">CORBA</span>
+                <span class="tech-tag">IDL</span>
+                <span class="tech-tag">ORB</span>
+                <span class="tech-tag">Middleware</span>
+                <span class="tech-tag">Distributed Systems</span>
+            </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>Implementation of a distributed vowel-counting service using CORBA (Common Object Request Broker Architecture). Unlike RMI which is Java-only, CORBA uses a language-neutral <strong>Interface Definition Language (IDL)</strong> to define the service contract, enabling a <strong>Java server</strong> to be consumed by both a <strong>Java client</strong> and a <strong>C client</strong> — demonstrating true cross-language distributed computing through an Object Request Broker (ORB).</p>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Server</div>
+                    <div class="value">Java (POA)</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Clients</div>
+                    <div class="value">Java + C</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Interface</div>
+                    <div class="value">IDL</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">ORB Port</div>
+                    <div class="value">1050</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Naming</div>
+                    <div class="value">CosNaming</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORBA vs RMI -->
+        <div class="section">
+            <h2 class="section-title">CORBA vs RMI — Key Difference</h2>
+            <div class="compare-grid">
+                <div class="compare-card">
+                    <h4>Java RMI</h4>
+                    <ul>
+                        <li>Java only</li>
+                        <li>Interface defined in Java</li>
+                        <li>RMI Registry for lookup</li>
+                        <li>Simpler setup</li>
+                    </ul>
+                </div>
+                <div class="compare-card">
+                    <h4>CORBA</h4>
+                    <ul>
+                        <li>Language independent</li>
+                        <li>Interface defined in IDL</li>
+                        <li>CosNaming Service for lookup</li>
+                        <li>Java, C, C++, Python clients</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- How CORBA Works -->
+        <div class="section">
+            <h2 class="section-title">How It Works — Development Flow</h2>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <div class="step-title">Write the IDL file <span class="lang-badge lang-idl">IDL</span></div>
+                        <div class="step-desc">Define the service interface in language-neutral IDL — <code>VoyelleService.idl</code></div>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <div class="step-title">Compile IDL → generate stubs & skeletons</div>
+                        <div class="step-desc"><code>idlj -fall VoyelleService.idl</code> → generates Java stub/skeleton. <code>idl_to_wsdl</code> or TAO for C.</div>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <div class="step-title">Implement the server <span class="lang-badge lang-java">Java</span></div>
+                        <div class="step-desc">Extend the generated <code>VoyelleServicePOA</code> skeleton and implement the business logic.</div>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">4</div>
+                    <div class="step-body">
+                        <div class="step-title">Write the client <span class="lang-badge lang-java">Java</span> <span class="lang-badge lang-c">C</span></div>
+                        <div class="step-desc">Both clients initialize an ORB, resolve the naming service, and call the remote method using their language's generated stub.</div>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">5</div>
+                    <div class="step-body">
+                        <div class="step-title">Run with ORB daemon</div>
+                        <div class="step-desc">Start <code>orbd</code> (or <code>tnameserv</code>), then launch server, then any client — in any language.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture -->
+        <div class="section">
+            <h2 class="section-title">Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-col">
+                    <div class="arch-box">
+                        <div class="arch-label">Client</div>
+                        <div class="arch-name">Java Client</div>
+                    </div>
+                    <div class="lang-badge lang-java">Java</div>
+                </div>
+                <div class="arch-arrow">
+                    <span class="arr">⇄</span>
+                    <span class="arr-label">stub / IIOP</span>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box highlight">
+                        <div class="arch-label">ORB + Naming</div>
+                        <div class="arch-name">orbd :1050</div>
+                    </div>
+                    <div class="lang-badge lang-idl">IDL Contract</div>
+                </div>
+                <div class="arch-arrow">
+                    <span class="arr">⇄</span>
+                    <span class="arr-label">skeleton / IIOP</span>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box">
+                        <div class="arch-label">Server</div>
+                        <div class="arch-name">VoyelleImpl</div>
+                    </div>
+                    <div class="lang-badge lang-java">Java</div>
+                </div>
+                <div style="width:100%;border-top:1px dashed rgba(152,113,133,0.3);margin:0.8rem 0;"></div>
+                <div class="arch-col">
+                    <div class="arch-box">
+                        <div class="arch-label">Client</div>
+                        <div class="arch-name">C Client</div>
+                    </div>
+                    <div class="lang-badge lang-c">C</div>
+                </div>
+                <div class="arch-arrow">
+                    <span class="arr">⇄</span>
+                    <span class="arr-label">stub / IIOP</span>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box highlight">
+                        <div class="arch-label">Same ORB</div>
+                        <div class="arch-name">orbd :1050</div>
+                    </div>
+                    <div class="lang-badge lang-idl">IDL Contract</div>
+                </div>
+                <div class="arch-arrow">
+                    <span class="arr">⇄</span>
+                    <span class="arr-label">same server</span>
+                </div>
+                <div class="arch-col">
+                    <div class="arch-box">
+                        <div class="arch-label">Server</div>
+                        <div class="arch-name">VoyelleImpl</div>
+                    </div>
+                    <div class="lang-badge lang-java">Java</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>IDL-defined interface — the single source of truth for all languages</li>
+                <li>Java server using POA (Portable Object Adapter) model</li>
+                <li>CosNaming service for object lookup and registration</li>
+                <li>Java client consuming the remote service via generated stub</li>
+                <li>C client demonstrating true cross-language interoperability via IIOP</li>
+                <li>ORB handles marshaling, transport, and object lifecycle transparently</li>
+            </ul>
+        </div>
+
+        <!-- Tabbed Code -->
+        <div class="section">
+            <h2 class="section-title">Source Code</h2>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('idl')">VoyelleService.idl</button>
+                <button class="tab-btn" onclick="showTab('impl')">VoyelleImpl.java</button>
+                <button class="tab-btn" onclick="showTab('server')">VoyelleServer.java</button>
+                <button class="tab-btn" onclick="showTab('jclient')">VoyelleClient.java</button>
+                <button class="tab-btn" onclick="showTab('cclient')">client_voyelle.c</button>
+            </div>
+
+            <!-- IDL -->
+            <div class="code-panel active" id="tab-idl">
+                <div class="code-block"><pre><span class="code-comment">// VoyelleService.idl
+// Language-neutral contract — compiled to Java stubs AND C stubs</span>
+
+<span class="code-keyword">module</span> VoyelleApp {
+
+    <span class="code-keyword">interface</span> <span class="code-type">VoyelleService</span> {
+
+        <span class="code-comment">/**
+         * Counts vowels (a, e, i, o, u, y) in the given string.
+         * @param texte  The input string
+         * @return       Number of vowels found
+         */</span>
+        <span class="code-keyword">long</span> compterVoyelles(<span class="code-keyword">in string</span> texte);
+
+    };
+
+};</pre></div>
+            </div>
+
+            <!-- VoyelleImpl -->
+            <div class="code-panel" id="tab-impl">
+                <div class="code-block"><pre><span class="code-keyword">import</span> VoyelleApp.VoyelleServicePOA;
+<span class="code-keyword">import</span> org.omg.CORBA.ORBPackage.InvalidName;
+
+<span class="code-comment">/**
+ * Server-side implementation — extends the generated POA skeleton.
+ * The ORB routes incoming calls from ANY language client to this class.
+ */</span>
+<span class="code-keyword">public class</span> <span class="code-type">VoyelleImpl</span> <span class="code-keyword">extends</span> <span class="code-type">VoyelleServicePOA</span> {
+
+    <span class="code-annot">@Override</span>
+    <span class="code-keyword">public int</span> compterVoyelles(<span class="code-type">String</span> texte) {
+        <span class="code-keyword">if</span> (texte == <span class="code-keyword">null</span> || texte.isEmpty()) <span class="code-keyword">return</span> 0;
+
+        <span class="code-keyword">int</span> compteur = 0;
+        <span class="code-type">String</span> min = texte.toLowerCase();
+
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i < min.length(); i++) {
+            <span class="code-keyword">char</span> c = min.charAt(i);
+            <span class="code-keyword">if</span> (c == <span class="code-string">'a'</span> || c == <span class="code-string">'e'</span> || c == <span class="code-string">'i'</span> ||
+                c == <span class="code-string">'o'</span> || c == <span class="code-string">'u'</span> || c == <span class="code-string">'y'</span>) {
+                compteur++;
+            }
+        }
+
+        System.out.println(<span class="code-string">"[CORBA Server] \""</span> + texte + <span class="code-string">"\" → "</span> + compteur);
+        <span class="code-keyword">return</span> compteur;
+    }
+}</pre></div>
+            </div>
+
+            <!-- VoyelleServer -->
+            <div class="code-panel" id="tab-server">
+                <div class="code-block"><pre><span class="code-keyword">import</span> VoyelleApp.VoyelleService;
+<span class="code-keyword">import</span> org.omg.CORBA.*;
+<span class="code-keyword">import</span> org.omg.CosNaming.*;
+<span class="code-keyword">import</span> org.omg.CosNaming.NamingContextPackage.*;
+<span class="code-keyword">import</span> org.omg.PortableServer.*;
+
+<span class="code-comment">/**
+ * Starts the ORB, activates the servant via POA,
+ * and registers it in the CosNaming service as "VoyelleService"
+ */</span>
+<span class="code-keyword">public class</span> <span class="code-type">VoyelleServer</span> {
+
+    <span class="code-keyword">public static void</span> main(<span class="code-type">String</span>[] args) {
+        <span class="code-keyword">try</span> {
+            <span class="code-comment">// 1 — Initialize the ORB</span>
+            <span class="code-type">ORB</span> orb = <span class="code-type">ORB</span>.init(args, <span class="code-keyword">null</span>);
+
+            <span class="code-comment">// 2 — Get the root POA and activate it</span>
+            <span class="code-type">POA</span> rootPOA = POAHelper.narrow(
+                orb.resolve_initial_references(<span class="code-string">"RootPOA"</span>));
+            rootPOA.the_POAManager().activate();
+
+            <span class="code-comment">// 3 — Create and activate the servant</span>
+            <span class="code-type">VoyelleImpl</span> servant = <span class="code-keyword">new</span> <span class="code-type">VoyelleImpl</span>();
+            rootPOA.activate_object(servant);
+
+            <span class="code-comment">// 4 — Register in the Naming Service</span>
+            org.omg.CORBA.<span class="code-type">Object</span> objRef =
+                orb.resolve_initial_references(<span class="code-string">"NameService"</span>);
+            <span class="code-type">NamingContextExt</span> ncRef = NamingContextExtHelper.narrow(objRef);
+
+            <span class="code-type">NameComponent</span>[] path = ncRef.to_name(<span class="code-string">"VoyelleService"</span>);
+            ncRef.rebind(path, rootPOA.servant_to_reference(servant));
+
+            System.out.println(<span class="code-string">"✓ CORBA Server ready — VoyelleService registered"</span>);
+            System.out.println(<span class="code-string">"  Accepting Java and C clients..."</span>);
+
+            <span class="code-comment">// 5 — Block and serve requests</span>
+            orb.run();
+
+        } <span class="code-keyword">catch</span> (<span class="code-type">Exception</span> e) { e.printStackTrace(); }
+    }
+}</pre></div>
+            </div>
+
+            <!-- Java Client -->
+            <div class="code-panel" id="tab-jclient">
+                <div class="code-block"><pre><span class="code-keyword">import</span> VoyelleApp.*;
+<span class="code-keyword">import</span> org.omg.CORBA.*;
+<span class="code-keyword">import</span> org.omg.CosNaming.*;
+<span class="code-keyword">import</span> java.util.Scanner;
+
+<span class="code-comment">/**
+ * Java CORBA client — resolves VoyelleService from the naming
+ * service and calls compterVoyelles() remotely via ORB/IIOP
+ */</span>
+<span class="code-keyword">public class</span> <span class="code-type">VoyelleClient</span> {
+
+    <span class="code-keyword">public static void</span> main(<span class="code-type">String</span>[] args) {
+        <span class="code-type">Scanner</span> scanner = <span class="code-keyword">new</span> <span class="code-type">Scanner</span>(System.in);
+        <span class="code-keyword">try</span> {
+            <span class="code-comment">// 1 — Initialize the ORB</span>
+            <span class="code-type">ORB</span> orb = <span class="code-type">ORB</span>.init(args, <span class="code-keyword">null</span>);
+
+            <span class="code-comment">// 2 — Locate the Naming Service</span>
+            org.omg.CORBA.<span class="code-type">Object</span> objRef =
+                orb.resolve_initial_references(<span class="code-string">"NameService"</span>);
+            <span class="code-type">NamingContextExt</span> ncRef = NamingContextExtHelper.narrow(objRef);
+
+            <span class="code-comment">// 3 — Resolve the service and narrow to the correct type</span>
+            <span class="code-type">VoyelleService</span> service =
+                VoyelleServiceHelper.narrow(ncRef.resolve_str(<span class="code-string">"VoyelleService"</span>));
+            System.out.println(<span class="code-string">"✓ Service CORBA trouvé\n"</span>);
+
+            <span class="code-comment">// 4 — Remote method invocation loop</span>
+            <span class="code-keyword">boolean</span> continuer = <span class="code-keyword">true</span>;
+            <span class="code-keyword">while</span> (continuer) {
+                System.out.print(<span class="code-string">"Entrez une chaîne : "</span>);
+                <span class="code-type">String</span> chaine = scanner.nextLine();
+
+                <span class="code-keyword">int</span> resultat = service.compterVoyelles(chaine);
+                System.out.println(<span class="code-string">"→ Voyelles : "</span> + resultat + <span class="code-string">"\n"</span>);
+
+                System.out.print(<span class="code-string">"Continuer ? (o/n) : "</span>);
+                <span class="code-type">String</span> rep = scanner.nextLine().trim().toLowerCase();
+                continuer = rep.equals(<span class="code-string">"o"</span>) || rep.equals(<span class="code-string">"oui"</span>);
+            }
+
+        } <span class="code-keyword">catch</span> (<span class="code-type">Exception</span> e) { e.printStackTrace(); }
+        <span class="code-keyword">finally</span> { scanner.close(); }
+    }
+}</pre></div>
+            </div>
+
+            <!-- C Client -->
+            <div class="code-panel" id="tab-cclient">
+                <div class="code-block"><pre><span class="code-comment">/*
+ * client_voyelle.c — C CORBA client using TAO ORB
+ * Compiled from the same VoyelleService.idl as the Java server.
+ * Calls compterVoyelles() on the Java server via IIOP — no Java needed.
+ */</span>
+
+<span class="code-preproc">#include</span> <span class="code-string">"VoyelleServiceC.h"</span>   <span class="code-comment">/* generated by tao_idl from VoyelleService.idl */</span>
+<span class="code-preproc">#include</span> <span class="code-string">"orbsvcs/CosNamingC.h"</span>
+<span class="code-preproc">#include</span> <span class="code-string"><stdio.h></span>
+<span class="code-preproc">#include</span> <span class="code-string"><string.h></span>
+
+<span class="code-keyword">int</span> main(<span class="code-keyword">int</span> argc, <span class="code-keyword">char</span>* argv[]) {
+
+    <span class="code-comment">/* 1 — Initialize the ORB */</span>
+    CORBA_Environment env = CORBA_ENVIRONMENT_INIT;
+    CORBA_ORB orb = CORBA_ORB_init(&argc, argv, <span class="code-string">"mico-local-orb"</span>, &env);
+
+    <span class="code-comment">/* 2 — Resolve the Naming Service */</span>
+    CORBA_Object nsObj = CORBA_ORB_resolve_initial_references(
+        orb, <span class="code-string">"NameService"</span>, &env);
+    CosNaming_NamingContext ns =
+        CosNaming_NamingContext__narrow(nsObj, &env);
+
+    <span class="code-comment">/* 3 — Build the name path and resolve the service */</span>
+    CosNaming_NameComponent name[1];
+    name[0].id   = <span class="code-string">"VoyelleService"</span>;
+    name[0].kind = <span class="code-string">""</span>;
+    CosNaming_Name path = {1, 1, name, CORBA_FALSE};
+
+    CORBA_Object svcObj =
+        CosNaming_NamingContext_resolve(ns, &path, &env);
+
+    VoyelleApp_VoyelleService svc =
+        VoyelleApp_VoyelleService__narrow(svcObj, &env);
+
+    printf(<span class="code-string">"✓ CORBA service found (Java server)\n\n"</span>);
+
+    <span class="code-comment">/* 4 — Call the remote method */</span>
+    <span class="code-keyword">char</span> input[256];
+    <span class="code-keyword">int</span>  continuer = 1;
+
+    <span class="code-keyword">while</span> (continuer) {
+        printf(<span class="code-string">"Enter a string: "</span>);
+        fgets(input, <span class="code-keyword">sizeof</span>(input), stdin);
+        input[strcspn(input, <span class="code-string">"\n"</span>)] = <span class="code-string">'\0'</span>; <span class="code-comment">/* strip newline */</span>
+
+        CORBA_long result =
+            VoyelleApp_VoyelleService_compterVoyelles(svc, input, &env);
+
+        printf(<span class="code-string">"→ Vowels: %d\n\n"</span>, (int)result);
+
+        printf(<span class="code-string">"Continue? (y/n): "</span>);
+        <span class="code-keyword">char</span> rep[4];
+        fgets(rep, <span class="code-keyword">sizeof</span>(rep), stdin);
+        continuer = (rep[0] == <span class="code-string">'y'</span> || rep[0] == <span class="code-string">'Y'</span>);
+    }
+
+    <span class="code-comment">/* 5 — Release resources */</span>
+    CORBA_Object_release(svc, &env);
+    CORBA_ORB_destroy(orb, &env);
+    <span class="code-keyword">return</span> 0;
+}</pre></div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>This project pushed my understanding of distributed middleware to a new level. CORBA's IDL-first approach taught me how a language-neutral contract can power interoperability between completely different runtimes. Writing both a Java and a C client against the same Java server made the ORB and IIOP protocol concrete — not just theoretical. I also understood the role of the POA (Portable Object Adapter) in managing object lifecycles on the server side, which is more explicit and powerful than RMI's model.</p>
+        </div>
+
+        <!-- Project Navigation -->
+        <div class="project-nav">
+            <a href="project-java-rmi.html">← Project 02 — Java RMI</a>
+            <a href="project-absence-management.html" class="next">Project 04 — Absence Management →</a>
+        </div>
+    </div>
+
+    <script>
+        function showTab(name) {
+            document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            navLinks.classList.toggle('open');
+        });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
+            hamburger.classList.remove('open');
+            navLinks.classList.remove('open');
+        }));
+    </script>
+</body>
+</html>

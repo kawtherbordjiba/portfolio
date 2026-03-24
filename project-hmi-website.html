@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMI Website - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .project-title { font-size:2.8rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:1.5rem; line-height:1.2; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(155px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        /* Screenshot */
+        .screenshot-wrap { border-radius:2px; overflow:hidden; border:1px solid rgba(152,113,133,0.2); cursor:pointer; transition:all 0.3s; background-color:rgba(255,255,255,0.1); }
+        .screenshot-wrap:hover { transform:translateY(-4px); box-shadow:0 10px 30px rgba(66,55,54,0.15); border-color:rgba(152,113,133,0.4); }
+        .screenshot-wrap img { width:100%; display:block; transition:transform 0.3s; }
+        .screenshot-wrap:hover img { transform:scale(1.02); }
+        .screenshot-caption { padding:0.8rem 1rem; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:#987185; }
+
+        /* Lightbox */
+        .lightbox { display:none; position:fixed; inset:0; background:rgba(66,55,54,0.92); z-index:2000; align-items:center; justify-content:center; padding:2rem; }
+        .lightbox.open { display:flex; }
+        .lightbox img { max-width:90vw; max-height:85vh; border-radius:2px; object-fit:contain; }
+        .lightbox-close { position:absolute; top:1.5rem; right:2rem; color:#F4E2D1; font-size:2rem; cursor:pointer; background:none; border:none; line-height:1; transition:color 0.2s; }
+        .lightbox-close:hover { color:#D6AA9F; }
+        .lightbox-caption { position:absolute; bottom:1.5rem; color:#D6AA9F; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; }
+
+        /* Demo CTA */
+        .demo-box { background:linear-gradient(135deg, rgba(66,55,54,0.06), rgba(152,113,133,0.08)); border:1px solid rgba(152,113,133,0.25); border-radius:2px; padding:2rem 2.5rem; display:flex; align-items:center; justify-content:space-between; gap:2rem; flex-wrap:wrap; }
+        .demo-box-text .demo-title { font-size:1rem; color:#423736; font-weight:400; margin-bottom:0.3rem; }
+        .demo-box-text .demo-sub { font-size:0.85rem; color:#987185; font-weight:300; }
+        .demo-btn { display:inline-block; padding:0.9rem 2.2rem; background-color:#423736; color:#F4E2D1; text-decoration:none; font-size:0.82rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; flex-shrink:0; }
+        .demo-btn:hover { background-color:transparent; color:#423736; }
+
+        /* Feature list */
+        .feature-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; }
+        .feature-list li { background-color:rgba(255,255,255,0.15); padding:1.2rem 1.5rem; border-radius:2px; font-size:0.95rem; color:#423736; font-weight:300; display:flex; align-items:flex-start; gap:0.8rem; }
+        .feature-list li::before { content:"—"; color:#987185; flex-shrink:0; }
+
+        /* Criteria */
+        .criteria-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(255px, 1fr)); gap:1rem; }
+        .criterion-card { background-color:rgba(255,255,255,0.15); padding:1.4rem; border-radius:2px; border:1px solid transparent; transition:all 0.3s; }
+        .criterion-card:hover { border-color:rgba(152,113,133,0.3); transform:translateY(-2px); }
+        .crit-header { display:flex; align-items:center; gap:0.7rem; margin-bottom:0.5rem; }
+        .crit-num { font-size:0.68rem; font-family:'Courier New', monospace; color:#987185; background:rgba(152,113,133,0.12); padding:0.2rem 0.5rem; border-radius:2px; }
+        .crit-name { font-size:0.85rem; color:#423736; font-weight:400; }
+        .crit-desc { font-size:0.8rem; color:#423736; opacity:0.65; font-weight:300; line-height:1.65; }
+
+        /* Theory list */
+        .theory-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; }
+        .theory-list li { background-color:rgba(255,255,255,0.15); padding:1.2rem 1.5rem; border-radius:2px; font-size:0.9rem; color:#423736; font-weight:300; display:flex; align-items:flex-start; gap:0.8rem; line-height:1.6; }
+        .theory-list li::before { content:"—"; color:#987185; flex-shrink:0; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+        .project-nav .next { margin-left:auto; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:2rem; }
+            .demo-box { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html#about">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html#contact" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <!-- Header -->
+        <div class="project-header">
+            <div class="project-number">Project 06</div>
+            <h1 class="project-title">ErgoForm — HMI Ergonomic Form Evaluator</h1>
+            <div class="project-meta">
+                <span class="tech-tag">HTML</span>
+                <span class="tech-tag">CSS</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">HMI</span>
+                <span class="tech-tag">ISO 9241</span>
+                <span class="tech-tag">WCAG</span>
+                <span class="tech-tag">Ergonomics</span>
+            </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>A browser-based tool that evaluates the ergonomic quality of a form design against established HMI principles — including ISO 9241 usability standards, Shneiderman's 8 Golden Rules, and WCAG accessibility guidelines. The user configures a form (colors, number of fields, labels, validation, feedback) and the tool instantly computes a <strong>score out of 100</strong> with a detailed per-criterion breakdown and a live visual preview of the form. The goal: turn HMI theory into something measurable and actionable.</p>
+        </div>
+
+        <!-- Info -->
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Type</div><div class="value">Browser Tool</div></div>
+                <div class="info-card"><div class="label">Stack</div><div class="value">HTML / CSS / JS</div></div>
+                <div class="info-card"><div class="label">Standard</div><div class="value">ISO 9241 + WCAG</div></div>
+                <div class="info-card"><div class="label">Criteria</div><div class="value">13 evaluated</div></div>
+                <div class="info-card"><div class="label">Output</div><div class="value">Score + Live Preview</div></div>
+                <div class="info-card"><div class="label">Backend</div><div class="value">None — client-side</div></div>
+            </div>
+        </div>
+
+        <!-- Screenshot -->
+        <div class="section">
+            <h2 class="section-title">Screenshot</h2>
+            <div class="screenshot-wrap" onclick="openLightbox('photos/ergo.png', 'ErgoForm — Ergonomic Form Evaluator')">
+                <img src="photos/ergo.png" alt="ErgoForm interface" onerror="this.parentElement.style.pointerEvents='none'; this.style.display='none'">
+                <div class="screenshot-caption">ErgoForm — Full Interface</div>
+            </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+            <button class="lightbox-close" onclick="closeLightbox()">×</button>
+            <img id="lightbox-img" src="" alt="">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+
+        <!-- Live Demo -->
+        <div class="section">
+            <div class="demo-box">
+                <div class="demo-box-text">
+                    <div class="demo-title">Try the tool live</div>
+                    <div class="demo-sub">Configure a form and get an instant ergonomic score — runs entirely in the browser, no server needed.</div>
+                </div>
+                <a href="ergoform.html" class="demo-btn" target="_blank">Open ErgoForm →</a>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>Real WCAG contrast ratio computed from hex colors using the official sRGB luminance formula</li>
+                <li>13 ergonomic criteria evaluated — from label clarity to responsive layout</li>
+                <li>Animated score ring counting up to the final result, color-coded green / yellow / red</li>
+                <li>Per-criterion feedback explaining what passed, what failed, and exactly why it matters</li>
+                <li>Live form preview rendered with the user's chosen colors, font size, and field count</li>
+                <li>Toggle checklist to simulate different form configurations instantly</li>
+                <li>Shneiderman's Rules #5 (error prevention) and #6 (informative feedback) directly applied</li>
+                <li>Runs entirely client-side — no backend, no dependencies, single HTML file</li>
+            </ul>
+        </div>
+
+        <!-- 13 Criteria -->
+        <div class="section">
+            <h2 class="section-title">The 13 Ergonomic Criteria</h2>
+            <div class="criteria-grid">
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">01</span><span class="crit-name">Color Contrast (WCAG)</span></div>
+                    <div class="crit-desc">Contrast ratio computed from background and text colors. Rated AAA (≥7:1), AA (≥4.5:1), or fail.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">02</span><span class="crit-name">Clear Field Labels</span></div>
+                    <div class="crit-desc">Every field must have a descriptive label — core ISO 9241 requirement. Missing labels score zero.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">03</span><span class="crit-name">Input Guidance</span></div>
+                    <div class="crit-desc">Placeholder text guiding expected format — e.g. DD/MM/YYYY, +213 XX XX XX XX.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">04</span><span class="crit-name">Required Field Markers</span></div>
+                    <div class="crit-desc">Mandatory fields must be visually marked to prevent confusing post-submit errors.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">05</span><span class="crit-name">Input Validation</span></div>
+                    <div class="crit-desc">Real-time or on-submit validation prevents incorrect data from reaching the backend.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">06</span><span class="crit-name">Error Message Clarity</span></div>
+                    <div class="crit-desc">Plain-language error messages. "Password must be 8 characters" beats a silent red border.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">07</span><span class="crit-name">Logical Field Grouping</span></div>
+                    <div class="crit-desc">Related fields grouped together reduce cognitive load and improve scan time.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">08</span><span class="crit-name">Form Length</span></div>
+                    <div class="crit-desc">Under 5 fields is ideal. Over 12 triggers an abandonment risk warning.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">09</span><span class="crit-name">Font Size</span></div>
+                    <div class="crit-desc">16px+ is ideal for all users. Below 12px is flagged as inaccessible.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">10</span><span class="crit-name">Form Width</span></div>
+                    <div class="crit-desc">Medium-width forms optimize reading line length. Too wide or too narrow both lose points.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">11</span><span class="crit-name">Submit Confirmation</span></div>
+                    <div class="crit-desc">Feedback after submission — applying Shneiderman's Rule #6 (informative feedback).</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">12</span><span class="crit-name">Responsive Layout</span></div>
+                    <div class="crit-desc">Form must adapt to mobile screens — over 60% of web traffic is on smartphones.</div>
+                </div>
+                <div class="criterion-card">
+                    <div class="crit-header"><span class="crit-num">13</span><span class="crit-name">Progress Indicator</span></div>
+                    <div class="crit-desc">For forms with 6+ fields, a step indicator is required to prevent user abandonment.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HMI Theory -->
+        <div class="section">
+            <h2 class="section-title">HMI Theory Applied</h2>
+            <ul class="theory-list">
+                <li><strong>ISO 9241</strong> — Usability standards for interactive systems: effectiveness, efficiency, satisfaction</li>
+                <li><strong>Shneiderman's 8 Golden Rules</strong> — Feedback, error prevention, consistency, user control</li>
+                <li><strong>WCAG 2.1</strong> — Contrast ratio thresholds: AA (4.5:1) and AAA (7:1) for normal text</li>
+                <li><strong>Nielsen's 10 Heuristics</strong> — Visibility of system status, user control, error recovery</li>
+                <li><strong>Cognitive Load Theory</strong> — Grouping fields and minimizing simultaneous decisions</li>
+                <li><strong>Fitts' Law</strong> — Button size and positioning for efficient, low-error interaction</li>
+            </ul>
+        </div>
+
+        <!-- What I Learned -->
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>Building a tool that <em>evaluates</em> HMI quality forced me to understand the theory at a much deeper level than simply applying it. Implementing the WCAG contrast ratio formula from scratch — converting hex colors to relative luminance values using the official sRGB formula — was particularly rewarding. This project made me realize that HMI ergonomics is not about aesthetics alone: it is a measurable, engineering discipline with real standards and formulas behind every design decision.</p>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-dss-website.html">← Project 05 — DSS Website</a>
+            <a href="project-store-website.html" class="next">Project 07 — Store Website →</a>
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(src, caption) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-caption').textContent = caption;
+            document.getElementById('lightbox').classList.add('open');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>

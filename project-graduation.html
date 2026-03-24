@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graduation Project - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        /* ── IN PROGRESS BANNER ── */
+        .in-progress-banner {
+            display:flex; align-items:center; gap:1rem;
+            background-color:rgba(152,113,133,0.1);
+            border:1px solid rgba(152,113,133,0.3);
+            border-left:3px solid #987185;
+            padding:1rem 1.5rem;
+            border-radius:2px;
+            margin-bottom:3rem;
+        }
+        .banner-dot {
+            width:10px; height:10px; border-radius:50%;
+            background-color:#987185;
+            flex-shrink:0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity:1; transform:scale(1); }
+            50%       { opacity:0.4; transform:scale(0.8); }
+        }
+        .banner-text { font-size:0.85rem; color:#987185; letter-spacing:1px; }
+        .banner-text strong { color:#423736; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .graduation-badge { display:inline-block; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:#F4E2D1; background-color:#987185; padding:0.3rem 0.8rem; border-radius:1px; margin-bottom:1rem; }
+        .project-title { font-size:2.4rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:0.8rem; line-height:1.3; }
+        .project-subtitle { font-size:1rem; color:#987185; font-weight:300; margin-bottom:1.5rem; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        /* ── PROBLEM + GOAL ── */
+        .highlight-box {
+            background-color:rgba(255,255,255,0.15);
+            border-left:3px solid rgba(152,113,133,0.5);
+            padding:1.8rem 2rem;
+            border-radius:0 2px 2px 0;
+            margin-bottom:1.5rem;
+        }
+        .highlight-box .box-label { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.8rem; }
+        .highlight-box p { font-size:0.95rem; color:#423736; font-weight:300; line-height:1.85; max-width:100%; }
+
+        /* ── INDICATORS GRID ── */
+        .indicators-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:1rem; }
+        .indicator-card { background-color:rgba(255,255,255,0.15); padding:1.5rem; border-radius:2px; border:1px solid transparent; transition:all 0.3s; }
+        .indicator-card:hover { border-color:rgba(152,113,133,0.3); transform:translateY(-3px); }
+        .indicator-icon { font-size:1.5rem; margin-bottom:0.7rem; }
+        .indicator-name { font-size:0.85rem; letter-spacing:1px; text-transform:uppercase; color:#423736; font-weight:400; margin-bottom:0.4rem; }
+        .indicator-desc { font-size:0.82rem; color:#423736; opacity:0.65; font-weight:300; line-height:1.6; }
+
+        /* ── PHASES ── */
+        .phases { display:flex; flex-direction:column; gap:0; }
+        .phase { display:flex; align-items:flex-start; gap:1.5rem; position:relative; }
+        .phase:not(:last-child)::after { content:''; position:absolute; left:1.1rem; top:3rem; bottom:-1rem; width:1px; background-color:rgba(152,113,133,0.25); }
+        .phase-num { width:2.2rem; height:2.2rem; border-radius:50%; background-color:rgba(152,113,133,0.15); border:1px solid rgba(152,113,133,0.4); display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#987185; flex-shrink:0; margin-top:0.15rem; }
+        .phase-num.done { background-color:rgba(152,113,133,0.3); border-color:#987185; color:#987185; }
+        .phase-num.active { background-color:rgba(152,113,133,0.2); border-color:#987185; color:#987185; animation:pulse 2s ease-in-out infinite; }
+        .phase-body { padding-bottom:2rem; }
+        .phase-title { font-size:0.95rem; color:#423736; font-weight:400; margin-bottom:0.3rem; display:flex; align-items:center; gap:0.8rem; }
+        .phase-status { font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase; padding:0.2rem 0.6rem; border-radius:10px; }
+        .status-done    { background:rgba(106,159,120,0.2); color:#6a9f78; }
+        .status-current { background:rgba(152,113,133,0.2); color:#987185; }
+        .status-next    { background:rgba(66,55,54,0.08); color:#423736; opacity:0.6; }
+        .phase-desc { font-size:0.88rem; color:#423736; opacity:0.7; font-weight:300; line-height:1.7; }
+
+        /* ── TECH STACK ── */
+        .stack-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; }
+        .stack-card { background-color:rgba(255,255,255,0.15); padding:1.5rem 1.8rem; border-radius:2px; }
+        .stack-card .stack-role { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.6rem; }
+        .stack-card .stack-items { font-size:0.9rem; color:#423736; font-weight:300; line-height:1.7; }
+
+        /* ── KEYWORDS ── */
+        .keywords { display:flex; flex-wrap:wrap; gap:0.5rem; }
+        .keyword { font-size:0.78rem; padding:0.4rem 0.9rem; background-color:rgba(66,55,54,0.07); border:1px solid rgba(152,113,133,0.2); color:#423736; border-radius:2px; letter-spacing:0.5px; font-weight:300; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html#about">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html#contact" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <!-- In-progress banner -->
+        <div class="in-progress-banner">
+            <div class="banner-dot"></div>
+            <div class="banner-text"><strong>Work in Progress</strong> — This project is currently under active development as part of my Bachelor's graduation requirement.</div>
+        </div>
+
+        <!-- Header -->
+        <div class="project-header">
+            <div class="graduation-badge">Graduation Project — Licence</div>
+            <div class="project-number">Project 11</div>
+            <h1 class="project-title">Design of an Intelligent Dashboard for Managing Group Adaptation in a CSCL Environment</h1>
+            <p class="project-subtitle">Université 8 Mai 1945, Guelma </p>
+            <div class="project-meta">
+                <span class="tech-tag">PHP</span>
+                <span class="tech-tag">Node.js</span>
+                <span class="tech-tag">MySQL</span>
+                <span class="tech-tag">Chart.js</span>
+                <span class="tech-tag">D3.js</span>
+                <span class="tech-tag">CSCL</span>
+                <span class="tech-tag">Learning Analytics</span>
+                <span class="tech-tag">Data Visualization</span>
+            </div>
+        </div>
+
+        <!-- Problem -->
+        <div class="section">
+            <h2 class="section-title">Problem Statement</h2>
+            <div class="highlight-box">
+                <div class="box-label">The Problem</div>
+                <p>In CSCL (Computer-Supported Collaborative Learning) environments, group formation and management play a critical role in the success of collaborative activities. Yet teachers rarely have intuitive tools to monitor group dynamics in real time, analyze interactions, detect imbalances — disengagement, overload, isolation — or effectively adapt group composition. The absence of a visual and decision-support system limits teachers' ability to optimize collaboration between learners.</p>
+            </div>
+            <div class="highlight-box">
+                <div class="box-label">Our Goal</div>
+                <p>Develop an intelligent dashboard that facilitates the management, analysis, and adaptation of learner groups within a CSCL system — giving teachers real-time visibility and actionable recommendations to improve collaborative learning outcomes.</p>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Type</div><div class="value">Web Application</div></div>
+                <div class="info-card"><div class="label">Context</div><div class="value">E-Learning / CSCL</div></div>
+                <div class="info-card"><div class="label">Target User</div><div class="value">Teachers / Tutors</div></div>
+                <div class="info-card"><div class="label">Team</div><div class="value">Binôme (2 students)</div></div>
+                <div class="info-card"><div class="label">University</div><div class="value">Univ. 8 Mai 1945</div></div>
+                <div class="info-card"><div class="label">Status</div><div class="value">In Development</div></div>
+            </div>
+        </div>
+
+        <!-- Key Indicators -->
+        <div class="section">
+            <h2 class="section-title">Key Indicators Tracked</h2>
+            <div class="indicators-grid">
+                <div class="indicator-card">
+                    <div class="indicator-icon">📊</div>
+                    <div class="indicator-name">Engagement</div>
+                    <div class="indicator-desc">Measures how actively each learner participates in collaborative tasks and interactions.</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-icon">💬</div>
+                    <div class="indicator-name">Participation</div>
+                    <div class="indicator-desc">Tracks contribution frequency, message volume, and activity traces within the group.</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-icon">🤝</div>
+                    <div class="indicator-name">Cohesion</div>
+                    <div class="indicator-desc">Evaluates the strength of inter-member relationships and group solidarity over time.</div>
+                </div>
+                <div class="indicator-card">
+                    <div class="indicator-icon">🎯</div>
+                    <div class="indicator-name">Performance</div>
+                    <div class="indicator-desc">Monitors group-level and individual task completion, quality, and progress rates.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Development Phases -->
+        <div class="section">
+            <h2 class="section-title">Project Phases</h2>
+            <div class="phases">
+                <div class="phase">
+                    <div class="phase-num done">1</div>
+                    <div class="phase-body">
+                        <div class="phase-title">Literature Review & Analysis <span class="phase-status status-done">Done</span></div>
+                        <div class="phase-desc">Study of CSCL concepts, group formation models, learning analytics, and data visualization. Identification of pedagogical and sociotechnical indicators used in the literature.</div>
+                    </div>
+                </div>
+                <div class="phase">
+                    <div class="phase-num active">2</div>
+                    <div class="phase-body">
+                        <div class="phase-title">Design & Conception <span class="phase-status status-current">In Progress</span></div>
+                        <div class="phase-desc">Modeling of learner data and indicators. Definition of use cases and group adaptation scenarios. UX/UI design of the dashboard — wireframes and prototypes.</div>
+                    </div>
+                </div>
+                <div class="phase">
+                    <div class="phase-num">3</div>
+                    <div class="phase-body">
+                        <div class="phase-title">Development <span class="phase-status status-next">Upcoming</span></div>
+                        <div class="phase-desc">Backend setup for data collection, storage, and indicator computation. Dashboard implementation with Chart.js, D3.js, and Recharts. Integration of filters, graphs, social learning networks, and heatmaps. Decision-support module for group adaptation recommendations.</div>
+                    </div>
+                </div>
+                <div class="phase">
+                    <div class="phase-num">4</div>
+                    <div class="phase-body">
+                        <div class="phase-title">Experimentation & Evaluation <span class="phase-status status-next">Upcoming</span></div>
+                        <div class="phase-desc">Testing with real or simulated data. Evaluation by teachers and tutors. Analysis of feedback, adjustments, and prototype validation.</div>
+                    </div>
+                </div>
+                <div class="phase">
+                    <div class="phase-num">5</div>
+                    <div class="phase-body">
+                        <div class="phase-title">Writing & Conclusion <span class="phase-status status-next">Upcoming</span></div>
+                        <div class="phase-desc">Synthesis of results. Limitations and perspectives — AI integration, real-time adaptation, full automation.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="section">
+            <h2 class="section-title">Technology Stack</h2>
+            <div class="stack-grid">
+                <div class="stack-card">
+                    <div class="stack-role">Backend</div>
+                    <div class="stack-items">PHP · Node.js · MySQL</div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-role">Data Visualization</div>
+                    <div class="stack-items">Chart.js · D3.js · Recharts</div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-role">Frontend</div>
+                    <div class="stack-items">HTML · CSS · JavaScript</div>
+                </div>
+                <div class="stack-card">
+                    <div class="stack-role">Dashboard Features</div>
+                    <div class="stack-items">Heatmaps · Social graphs · Filters · Real-time indicators</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keywords -->
+        <div class="section">
+            <h2 class="section-title">Keywords</h2>
+            <div class="keywords">
+                <span class="keyword">CSCL</span>
+                <span class="keyword">Learning Analytics</span>
+                <span class="keyword">Intelligent Dashboard</span>
+                <span class="keyword">Data Visualization</span>
+                <span class="keyword">Group Adaptation</span>
+                <span class="keyword">Online Collaboration</span>
+                <span class="keyword">Learner Profile</span>
+                <span class="keyword">Engagement Indicators</span>
+                <span class="keyword">Pedagogical Interaction</span>
+                <span class="keyword">Decision Support</span>
+            </div>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-sorting-algorithms.html">← Project 10 — Sorting Algorithms</a>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>

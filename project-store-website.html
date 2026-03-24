@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Website - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .project-title { font-size:2.8rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:1.5rem; line-height:1.2; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(155px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        /* ── GALLERY ── */
+        .gallery { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; }
+        .gallery-item { border-radius:2px; overflow:hidden; border:1px solid rgba(152,113,133,0.2); cursor:pointer; transition:all 0.3s; background-color:rgba(255,255,255,0.1); }
+        .gallery-item:hover { transform:translateY(-4px); box-shadow:0 8px 24px rgba(66,55,54,0.15); border-color:rgba(152,113,133,0.4); }
+        .gallery-item img { width:100%; height:150px; object-fit:cover; object-position:top; display:block; transition:transform 0.3s; }
+        .gallery-item:hover img { transform:scale(1.04); }
+        .gallery-caption { padding:0.7rem 1rem; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:#987185; }
+
+        /* ── LIGHTBOX ── */
+        .lightbox { display:none; position:fixed; inset:0; background:rgba(66,55,54,0.92); z-index:2000; align-items:center; justify-content:center; padding:2rem; }
+        .lightbox.open { display:flex; }
+        .lightbox img { max-width:90vw; max-height:85vh; border-radius:2px; object-fit:contain; }
+        .lightbox-close { position:absolute; top:1.5rem; right:2rem; color:#F4E2D1; font-size:2rem; cursor:pointer; background:none; border:none; line-height:1; transition:color 0.2s; }
+        .lightbox-close:hover { color:#D6AA9F; }
+        .lightbox-caption { position:absolute; bottom:1.5rem; color:#D6AA9F; font-size:0.8rem; letter-spacing:2px; text-transform:uppercase; }
+
+        /* ── COLOR PALETTE ── */
+        .palette { display:flex; flex-wrap:wrap; gap:1rem; }
+        .color-swatch { display:flex; align-items:center; gap:0.8rem; background-color:rgba(255,255,255,0.15); padding:0.8rem 1.2rem; border-radius:2px; flex:1; min-width:160px; }
+        .swatch-circle { width:36px; height:36px; border-radius:50%; flex-shrink:0; border:1px solid rgba(66,55,54,0.1); }
+        .swatch-info .swatch-name { font-size:0.82rem; color:#423736; font-weight:400; }
+        .swatch-info .swatch-hex { font-size:0.75rem; color:#987185; font-family:'Courier New', monospace; }
+
+        /* ── HMI PRINCIPLES ── */
+        .hmi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:1rem; }
+        .hmi-card { background-color:rgba(255,255,255,0.15); padding:1.5rem; border-radius:2px; border:1px solid transparent; transition:all 0.3s; }
+        .hmi-card:hover { border-color:rgba(152,113,133,0.3); transform:translateY(-2px); }
+        .hmi-icon { font-size:1.4rem; margin-bottom:0.7rem; }
+        .hmi-title { font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; color:#423736; font-weight:400; margin-bottom:0.5rem; }
+        .hmi-desc { font-size:0.85rem; color:#423736; opacity:0.7; font-weight:300; line-height:1.7; }
+
+        /* ── PAGES LIST ── */
+        .pages-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; }
+        .page-card { background-color:rgba(255,255,255,0.15); padding:1.3rem 1.5rem; border-radius:2px; display:flex; align-items:flex-start; gap:0.8rem; }
+        .page-num { font-size:0.72rem; color:#987185; font-family:'Courier New', monospace; margin-top:0.15rem; flex-shrink:0; }
+        .page-info .page-name { font-size:0.9rem; color:#423736; font-weight:400; margin-bottom:0.2rem; }
+        .page-info .page-desc { font-size:0.8rem; color:#423736; opacity:0.65; font-weight:300; line-height:1.5; }
+
+        /* ── FEATURE LIST ── */
+        .feature-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; }
+        .feature-list li { background-color:rgba(255,255,255,0.15); padding:1.2rem 1.5rem; border-radius:2px; font-size:0.95rem; color:#423736; font-weight:300; display:flex; align-items:flex-start; gap:0.8rem; }
+        .feature-list li::before { content:"—"; color:#987185; flex-shrink:0; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+        .project-nav .next { margin-left:auto; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:2rem; }
+            .gallery { grid-template-columns:1fr 1fr; }
+            .palette { flex-direction:column; }
+        }
+        @media (max-width:480px) {
+            .gallery { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html">About Me</a></li>
+            <li><a href="index.html">Education</a></li>
+            <li><a href="index.html">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <!-- Header -->
+        <div class="project-header">
+            <div class="project-number">Project 07</div>
+            <h1 class="project-title">TechNova — Store Website</h1>
+            <div class="project-meta">
+                <span class="tech-tag">HTML</span>
+                <span class="tech-tag">CSS</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">PHP</span>
+                <span class="tech-tag">MySQL</span>
+                <span class="tech-tag">HMI / Ergonomics</span>
+                <span class="tech-tag">UX Design</span>
+            </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>A fully functional e-commerce website for an electronics store called <strong>TechNova</strong>, built with a PHP/MySQL backend and a carefully designed frontend. The project's focus went beyond basic functionality — it was an applied study of <strong>HMI (Human-Machine Interface) ergonomics</strong>: color psychology, visual hierarchy, user guidance, and form clarity. Every design decision — from the dark gradient palette to the step-by-step checkout instructions — was made to reduce cognitive load and guide the user naturally through the experience.</p>
+        </div>
+
+        <!-- Info -->
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Frontend</div><div class="value">HTML / CSS / JS</div></div>
+                <div class="info-card"><div class="label">Backend</div><div class="value">PHP</div></div>
+                <div class="info-card"><div class="label">Database</div><div class="value">MySQL</div></div>
+                <div class="info-card"><div class="label">Store Name</div><div class="value">TechNova</div></div>
+                <div class="info-card"><div class="label">Focus</div><div class="value">HMI Ergonomics</div></div>
+                <div class="info-card"><div class="label">Categories</div><div class="value">Phones · Watches · TVs · Laptops</div></div>
+            </div>
+        </div>
+
+        <!-- Screenshots -->
+        <div class="section">
+            <h2 class="section-title">Screenshots</h2>
+            <div class="gallery">
+                <div class="gallery-item" onclick="openLightbox('photos/homepage2.png','Homepage')">
+                    <img src="photos/homepage2.png" alt="Homepage" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Homepage</div>
+                </div>
+                <div class="gallery-item" onclick="openLightbox('photos/shopbycategory.png','Shop by Category')">
+                    <img src="photos/shopbycategory.png" alt="Shop by Category" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Shop by Category</div>
+                </div>
+                <div class="gallery-item" onclick="openLightbox('photos/login2.png','Login')">
+                    <img src="photos/login2.png" alt="Login" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Login</div>
+                </div>
+                <div class="gallery-item" onclick="openLightbox('photos/creataccount.png','Create Account')">
+                    <img src="photos/creataccount.png" alt="Create Account" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Create Account</div>
+                </div>
+                <div class="gallery-item" onclick="openLightbox('photos/example.png','Product Example')">
+                    <img src="photos/example.png" alt="Product Example" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Product Page</div>
+                </div>
+                <div class="gallery-item" onclick="openLightbox('photos/confirmpurches.png','Confirm Purchase')">
+                    <img src="photos/confirmpurches.png" alt="Confirm Purchase" onerror="this.parentElement.style.display='none'">
+                    <div class="gallery-caption">Confirm Purchase</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+            <button class="lightbox-close" onclick="closeLightbox()">×</button>
+            <img id="lightbox-img" src="" alt="">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+
+        <!-- Color Palette -->
+        <div class="section">
+            <h2 class="section-title">Color Palette — HMI Design Choice</h2>
+            <p style="margin-bottom:1.5rem;">The palette was chosen deliberately to reflect a premium technology brand. The dark navy-to-crimson gradient creates a sense of depth and sophistication, while the warm red accent draws attention to key actions (Login/Register button). These are not arbitrary choices — they follow HMI principles of contrast, attention hierarchy, and emotional tone.</p>
+            <div class="palette">
+                <div class="color-swatch">
+                    <div class="swatch-circle" style="background:linear-gradient(135deg,#1a1a3e,#2d1f4e);"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Deep Navy</div>
+                        <div class="swatch-hex">Background / Footer</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-circle" style="background:linear-gradient(135deg,#8b1a3a,#c0392b);"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Crimson Red</div>
+                        <div class="swatch-hex">Hero gradient / Accents</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-circle" style="background:#e8a87c;"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Warm Amber</div>
+                        <div class="swatch-hex">Headings / Brand name</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-circle" style="background:#ffffff; border:1px solid #ddd;"></div>
+                    <div class="swatch-info">
+                        <div class="swatch-name">Pure White</div>
+                        <div class="swatch-hex">Body text / Nav links</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HMI Ergonomics -->
+        <div class="section">
+            <h2 class="section-title">HMI Ergonomics Applied</h2>
+            <div class="hmi-grid">
+                <div class="hmi-card">
+                    <div class="hmi-icon">🎨</div>
+                    <div class="hmi-title">Color Psychology</div>
+                    <div class="hmi-desc">Dark background reduces eye strain during browsing sessions. Red CTA buttons trigger urgency and draw immediate attention to key actions.</div>
+                </div>
+                <div class="hmi-card">
+                    <div class="hmi-icon">🧭</div>
+                    <div class="hmi-title">User Guidance</div>
+                    <div class="hmi-desc">Forms include clear labels and inline instructions — e.g., "Enter your full name", "Date of birth (DD/MM/YYYY)" — eliminating ambiguity at every input step.</div>
+                </div>
+                <div class="hmi-card">
+                    <div class="hmi-icon">📐</div>
+                    <div class="hmi-title">Visual Hierarchy</div>
+                    <div class="hmi-desc">Categories are presented as large, equally-spaced cards with images and brief descriptions — guiding the eye naturally without overwhelming the user.</div>
+                </div>
+                <div class="hmi-card">
+                    <div class="hmi-icon">✅</div>
+                    <div class="hmi-title">Feedback & Confirmation</div>
+                    <div class="hmi-desc">A dedicated confirmation page for purchases provides clear order summary and success feedback — preventing user anxiety after completing a transaction.</div>
+                </div>
+                <div class="hmi-card">
+                    <div class="hmi-icon">⚡</div>
+                    <div class="hmi-title">Consistency</div>
+                    <div class="hmi-desc">Navigation, button styles, and color usage are consistent across all pages — reducing the cognitive load needed to learn the interface.</div>
+                </div>
+                <div class="hmi-card">
+                    <div class="hmi-icon">🔍</div>
+                    <div class="hmi-title">Affordance</div>
+                    <div class="hmi-desc">Interactive elements (buttons, category cards) are visually distinct from static content — making it immediately clear what is clickable.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pages -->
+        <div class="section">
+            <h2 class="section-title">Pages Designed</h2>
+            <div class="pages-grid">
+                <div class="page-card">
+                    <div class="page-num">01</div>
+                    <div class="page-info">
+                        <div class="page-name">Homepage</div>
+                        <div class="page-desc">Hero section, category cards, contact footer with social links.</div>
+                    </div>
+                </div>
+                <div class="page-card">
+                    <div class="page-num">02</div>
+                    <div class="page-info">
+                        <div class="page-name">Shop by Category</div>
+                        <div class="page-desc">Browse Phones, Smart Watches, TVs, and Laptops with filtered listings.</div>
+                    </div>
+                </div>
+                <div class="page-card">
+                    <div class="page-num">03</div>
+                    <div class="page-info">
+                        <div class="page-name">Login</div>
+                        <div class="page-desc">Guided login form with clear labels and error messaging.</div>
+                    </div>
+                </div>
+                <div class="page-card">
+                    <div class="page-num">04</div>
+                    <div class="page-info">
+                        <div class="page-name">Create Account</div>
+                        <div class="page-desc">Registration form with step-by-step field instructions (name, birth date, email).</div>
+                    </div>
+                </div>
+                <div class="page-card">
+                    <div class="page-num">05</div>
+                    <div class="page-info">
+                        <div class="page-name">Product Page</div>
+                        <div class="page-desc">Individual product view with details, price, and add-to-cart action.</div>
+                    </div>
+                </div>
+                <div class="page-card">
+                    <div class="page-num">06</div>
+                    <div class="page-info">
+                        <div class="page-name">Confirm Purchase</div>
+                        <div class="page-desc">Clear order summary and confirmation feedback after checkout.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>Full user authentication — register, login, session management in PHP</li>
+                <li>Product catalog organized by category with MySQL backend</li>
+                <li>Shopping cart and purchase confirmation flow</li>
+                <li>HMI-focused forms — clear field labels, inline guidance, date format hints</li>
+                <li>Consistent dark gradient design system across all pages</li>
+                <li>Responsive layout adapting to different screen sizes</li>
+            </ul>
+        </div>
+
+        <!-- What I Learned -->
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>This project was my first deep dive into HMI ergonomics as a discipline — not just building something that works, but building something that feels right to use. Choosing the color palette, writing clear form instructions, and structuring the visual hierarchy taught me that good UI is about reducing friction at every step. Combining that with a full PHP/MySQL backend gave me end-to-end experience in building a real web product.</p>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-hmi-website.html">← Project 06 — HMI Website</a>
+            <a href="project-dijkstra.html" class="next">Project 08 — Dijkstra →</a>
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(src, caption) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-caption').textContent = caption;
+            document.getElementById('lightbox').classList.add('open');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>

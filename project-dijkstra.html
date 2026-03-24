@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijkstra Algorithm - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .project-title { font-size:2.8rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:1.5rem; line-height:1.2; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+        code { font-family:'Courier New', monospace; font-size:0.88em; background:rgba(152,113,133,0.1); padding:0.1rem 0.4rem; border-radius:2px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        .feature-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; }
+        .feature-list li { background-color:rgba(255,255,255,0.15); padding:1.2rem 1.5rem; border-radius:2px; font-size:0.95rem; color:#423736; font-weight:300; display:flex; align-items:flex-start; gap:0.8rem; }
+        .feature-list li::before { content:"—"; color:#987185; flex-shrink:0; }
+
+        /* Steps */
+        .steps { display:flex; flex-direction:column; gap:0; }
+        .step { display:flex; align-items:flex-start; gap:1.5rem; position:relative; }
+        .step:not(:last-child)::after { content:''; position:absolute; left:1.1rem; top:3rem; bottom:-1rem; width:1px; background-color:rgba(152,113,133,0.25); }
+        .step-num { width:2.2rem; height:2.2rem; border-radius:50%; background-color:rgba(152,113,133,0.15); border:1px solid rgba(152,113,133,0.4); display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#987185; flex-shrink:0; margin-top:0.15rem; }
+        .step-body { padding-bottom:2rem; }
+        .step-title { font-size:0.95rem; color:#423736; font-weight:400; margin-bottom:0.3rem; }
+        .step-desc { font-size:0.88rem; color:#423736; opacity:0.7; font-weight:300; }
+
+        /* Complexity table */
+        .complexity-table { width:100%; border-collapse:collapse; }
+        .complexity-table th { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; font-weight:400; padding:0.8rem 1.2rem; text-align:left; border-bottom:1px solid rgba(152,113,133,0.2); }
+        .complexity-table td { padding:0.8rem 1.2rem; font-size:0.9rem; color:#423736; font-weight:300; font-family:'Courier New', monospace; border-bottom:1px solid rgba(152,113,133,0.08); }
+        .complexity-table tr:last-child td { border-bottom:none; }
+        .complexity-table tr { background-color:rgba(255,255,255,0.1); }
+        .complexity-table tr:hover { background-color:rgba(255,255,255,0.2); }
+
+        /* Code snippet */
+        .code-block { background-color:#423736; border-radius:2px; padding:2rem; overflow-x:auto; }
+        .code-block pre { font-family:'Courier New', monospace; font-size:0.82rem; color:#F4E2D1; line-height:1.75; white-space:pre; }
+        .code-comment { color:#987185; }
+        .code-keyword { color:#D6AA9F; }
+        .code-string { color:#c8a97e; }
+        .code-type { color:#b8d4c8; }
+        .code-preproc { color:#c8a97e; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+        .project-nav .next { margin-left:auto; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html#about">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html#contact" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <div class="project-header">
+            <div class="project-number">Project 08</div>
+            <h1 class="project-title">Dijkstra Algorithm Program</h1>
+            <div class="project-meta">
+                <span class="tech-tag">C</span>
+                <span class="tech-tag">Graph Algorithms</span>
+                <span class="tech-tag">Shortest Path</span>
+                <span class="tech-tag">Data Structures</span>
+                <span class="tech-tag">Greedy Algorithm</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>Implementation of Dijkstra's shortest path algorithm in C, applied to a weighted directed graph represented as an adjacency matrix. The program computes the minimum distance from a chosen source vertex to all other vertices in the graph, and reconstructs the full shortest path using a predecessor array. This is a fundamental greedy algorithm widely used in network routing protocols such as OSPF and IS-IS.</p>
+        </div>
+
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Language</div><div class="value">C</div></div>
+                <div class="info-card"><div class="label">Type</div><div class="value">Greedy Algorithm</div></div>
+                <div class="info-card"><div class="label">Graph</div><div class="value">Weighted, Directed</div></div>
+                <div class="info-card"><div class="label">Representation</div><div class="value">Adjacency Matrix</div></div>
+                <div class="info-card"><div class="label">Input</div><div class="value">Terminal / stdin</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">How the Algorithm Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-body">
+                        <div class="step-title">Initialize distances</div>
+                        <div class="step-desc">Set distance to source = 0, all others = ∞. Mark all vertices unvisited.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-body">
+                        <div class="step-title">Pick the unvisited vertex with minimum distance</div>
+                        <div class="step-desc">This is the greedy step — always extend the shortest known path first.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-body">
+                        <div class="step-title">Relax all neighboring edges</div>
+                        <div class="step-desc">For each neighbor, if <code>dist[u] + weight(u,v) &lt; dist[v]</code>, update <code>dist[v]</code> and record predecessor.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-body">
+                        <div class="step-title">Mark current vertex as visited</div>
+                        <div class="step-desc">A visited vertex's shortest distance is finalized — it will never be updated again.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">5</div>
+                    <div class="step-body">
+                        <div class="step-title">Repeat until all vertices are visited</div>
+                        <div class="step-desc">Backtrack through the predecessor array to reconstruct and print the full shortest path.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>Adjacency matrix input — reads weighted graph from terminal</li>
+                <li>Predecessor array to reconstruct the full path, not just the distance</li>
+                <li>Handles disconnected nodes — detects unreachable vertices</li>
+                <li>Works on directed and undirected weighted graphs</li>
+                <li>Only works with non-negative edge weights (by design)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Complexity Analysis</h2>
+            <table class="complexity-table">
+                <thead>
+                    <tr><th>Case</th><th>Time Complexity</th><th>Space Complexity</th><th>Note</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>This implementation</td><td>O(V²)</td><td>O(V²)</td><td>Adjacency matrix + linear scan</td></tr>
+                    <tr><td>With min-heap (priority queue)</td><td>O((V+E) log V)</td><td>O(V)</td><td>Optimal for sparse graphs</td></tr>
+                    <tr><td>Best case</td><td>O(V²)</td><td>—</td><td>Source = target</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Core Implementation</h2>
+            <div class="code-block"><pre><span class="code-preproc">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+<span class="code-preproc">#define</span> INFINITY 9999
+<span class="code-preproc">#define</span> MAX      10
+
+<span class="code-keyword">void</span> dijkstra(<span class="code-keyword">int</span> G[MAX][MAX], <span class="code-keyword">int</span> n, <span class="code-keyword">int</span> startnode) {
+    <span class="code-keyword">int</span> cost[MAX][MAX], distance[MAX], pred[MAX];
+    <span class="code-keyword">int</span> visited[MAX], count, mindistance, nextnode, i, j;
+
+    <span class="code-comment">/* Build cost matrix — replace 0 with INFINITY for non-edges */</span>
+    <span class="code-keyword">for</span> (i = 0; i &lt; n; i++)
+        <span class="code-keyword">for</span> (j = 0; j &lt; n; j++)
+            cost[i][j] = (G[i][j] == 0) ? INFINITY : G[i][j];
+
+    <span class="code-comment">/* Initialize distance[], pred[] and visited[] */</span>
+    <span class="code-keyword">for</span> (i = 0; i &lt; n; i++) {
+        distance[i] = cost[startnode][i];
+        pred[i]     = startnode;
+        visited[i]  = 0;
+    }
+    distance[startnode] = 0;
+    visited[startnode]  = 1;
+    count = 1;
+
+    <span class="code-keyword">while</span> (count &lt; n - 1) {
+        <span class="code-comment">/* Greedy step: pick unvisited vertex with min distance */</span>
+        mindistance = INFINITY;
+        <span class="code-keyword">for</span> (i = 0; i &lt; n; i++)
+            <span class="code-keyword">if</span> (distance[i] &lt; mindistance &amp;&amp; !visited[i]) {
+                mindistance = distance[i];
+                nextnode    = i;
+            }
+
+        visited[nextnode] = 1;
+
+        <span class="code-comment">/* Relax edges from nextnode */</span>
+        <span class="code-keyword">for</span> (i = 0; i &lt; n; i++)
+            <span class="code-keyword">if</span> (!visited[i] &amp;&amp; mindistance + cost[nextnode][i] &lt; distance[i]) {
+                distance[i] = mindistance + cost[nextnode][i];
+                pred[i]     = nextnode;
+            }
+        count++;
+    }
+
+    <span class="code-comment">/* Print shortest paths and distances */</span>
+    <span class="code-keyword">for</span> (i = 0; i &lt; n; i++) {
+        <span class="code-keyword">if</span> (i != startnode) {
+            printf(<span class="code-string">"Distance to %d: %d\n"</span>, i, distance[i]);
+            printf(<span class="code-string">"Path: %d"</span>, i);
+            j = i;
+            <span class="code-keyword">while</span> (j != startnode) { printf(<span class="code-string">" &lt;- %d"</span>, pred[j]); j = pred[j]; }
+            printf(<span class="code-string">"\n"</span>);
+        }
+    }
+}
+
+<span class="code-keyword">int</span> main() {
+    <span class="code-keyword">int</span> G[MAX][MAX], n, u;
+    printf(<span class="code-string">"Enter number of vertices: "</span>); scanf(<span class="code-string">"%d"</span>, &amp;n);
+    printf(<span class="code-string">"Enter adjacency matrix:\n"</span>);
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = 0; i &lt; n; i++)
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = 0; j &lt; n; j++) scanf(<span class="code-string">"%d"</span>, &amp;G[i][j]);
+    printf(<span class="code-string">"Enter starting node: "</span>); scanf(<span class="code-string">"%d"</span>, &amp;u);
+    dijkstra(G, n, u);
+    <span class="code-keyword">return</span> 0;
+}</pre></div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>Implementing Dijkstra in C taught me how greedy algorithms build an optimal global solution from locally optimal choices. I also learned how to represent graphs using adjacency matrices, manage visited state, and backtrack through a predecessor array to reconstruct full paths — skills directly applicable to network routing and map navigation problems.</p>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-store-website.html">← Project 07 — Store Website</a>
+            <a href="project-bellman-ford.html" class="next">Project 09 — Bellman-Ford →</a>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>

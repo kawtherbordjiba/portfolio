@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Sockets - Kawther Bordjiba</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F4E2D1;
+            color: #423736;
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(66, 55, 54, 0.95);
+            padding: 0 3rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            color: #D6AA9F;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            font-weight: 400;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #F4E2D1;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav a:hover { color: #D6AA9F; }
+
+        .nav-cta {
+            padding: 0.45rem 1.2rem;
+            border: 1px solid #D6AA9F;
+            color: #D6AA9F !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 1.5px;
+            transition: all 0.3s !important;
+        }
+
+        .nav-cta:hover {
+            background-color: #D6AA9F;
+            color: #423736 !important;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 1.5px;
+            background-color: #F4E2D1;
+            transition: all 0.3s;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 8rem 3rem 5rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: transparent;
+            color: #423736;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border: 1px solid #423736;
+            margin-bottom: 3rem;
+        }
+
+        .back-button:hover {
+            background-color: #423736;
+            color: #F4E2D1;
+        }
+
+        /* ── HEADER ── */
+        .project-header {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid rgba(152, 113, 133, 0.2);
+            padding-bottom: 3rem;
+        }
+
+        .project-number {
+            font-size: 0.8rem;
+            color: #987185;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: #423736;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.9rem;
+            background-color: rgba(152, 113, 133, 0.15);
+            color: #987185;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* ── SECTIONS ── */
+        .section {
+            margin-bottom: 3.5rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 1.2rem;
+        }
+
+        .section p {
+            font-size: 1rem;
+            color: #423736;
+            font-weight: 300;
+            line-height: 1.9;
+            max-width: 750px;
+        }
+
+        /* ── INFO GRID ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 1.5rem 2rem;
+            border-radius: 2px;
+        }
+
+        .info-card .label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card .value {
+            font-size: 1rem;
+            color: #423736;
+            font-weight: 300;
+        }
+
+        /* ── FEATURES LIST ── */
+        .feature-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-list li {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 1.2rem 1.5rem;
+            border-radius: 2px;
+            font-size: 0.95rem;
+            color: #423736;
+            font-weight: 300;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .feature-list li::before {
+            content: "—";
+            color: #987185;
+            flex-shrink: 0;
+        }
+
+        /* ── CODE BLOCK ── */
+        .code-block {
+            background-color: #423736;
+            border-radius: 2px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #F4E2D1;
+            line-height: 1.7;
+            white-space: pre;
+        }
+
+        .code-comment { color: #987185; }
+        .code-keyword { color: #D6AA9F; }
+        .code-string  { color: #c8a97e; }
+        .code-type    { color: #b8d4c8; }
+
+        /* ── ARCHITECTURE DIAGRAM ── */
+        .arch-diagram {
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            padding: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .arch-box {
+            background-color: rgba(66, 55, 54, 0.08);
+            border: 1px solid rgba(152, 113, 133, 0.3);
+            border-radius: 2px;
+            padding: 1.2rem 2rem;
+            min-width: 130px;
+        }
+
+        .arch-box .arch-label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #987185;
+            margin-bottom: 0.4rem;
+        }
+
+        .arch-box .arch-name {
+            font-size: 1rem;
+            color: #423736;
+            font-weight: 400;
+        }
+
+        .arch-arrow {
+            font-size: 1.5rem;
+            color: #987185;
+        }
+
+        .arch-arrow span {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #987185;
+            margin-top: 0.3rem;
+        }
+
+        /* ── NAV BETWEEN PROJECTS ── */
+        .project-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(152, 113, 133, 0.2);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .project-nav a {
+            text-decoration: none;
+            color: #423736;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-nav a:hover { color: #987185; }
+        .project-nav .next { margin-left: auto; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav { padding: 0 1.2rem; }
+
+            .hamburger { display: flex; }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(66, 55, 54, 0.98);
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+            }
+
+            nav ul.open { display: flex; }
+            nav ul li { width: 100%; text-align: center; }
+            nav a { display: block; padding: 0.9rem 1.5rem; font-size: 0.9rem; }
+            .nav-cta { margin: 0.5rem 2rem; }
+
+            .container { padding: 6rem 1.5rem 3rem; }
+            .project-title { font-size: 2rem; }
+            .arch-diagram { flex-direction: column; }
+            .arch-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html#about">About Me</a></li>
+            <li><a href="index.html#education">Education</a></li>
+            <li><a href="index.html#skills">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html#contact" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <!-- Header -->
+        <div class="project-header">
+            <div class="project-number">Project 01</div>
+            <h1 class="project-title">Java Sockets</h1>
+            <div class="project-meta">
+                <span class="tech-tag">Java</span>
+                <span class="tech-tag">Networking</span>
+                <span class="tech-tag">TCP/IP</span>
+                <span class="tech-tag">Distributed Systems</span>
+                <span class="tech-tag">Client-Server</span>
+            </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>Implementation of a client-server communication system using Java Sockets in the context of Distributed Information Systems. The application demonstrates low-level network programming by establishing TCP connections between multiple clients and a multithreaded server, enabling real-time data exchange over a local network.</p>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Language</div>
+                    <div class="value">Java</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Protocol</div>
+                    <div class="value">TCP / IP</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Architecture</div>
+                    <div class="value">Client – Server</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Context</div>
+                    <div class="value">Distributed Systems</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Architecture -->
+        <div class="section">
+            <h2 class="section-title">Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-box">
+                    <div class="arch-label">Client</div>
+                    <div class="arch-name">Socket Client</div>
+                </div>
+                <div class="arch-arrow">⇄ <span>TCP/IP</span></div>
+                <div class="arch-box">
+                    <div class="arch-label">Server</div>
+                    <div class="arch-name">ServerSocket</div>
+                </div>
+                <div class="arch-arrow">→ <span>Thread</span></div>
+                <div class="arch-box">
+                    <div class="arch-label">Handler</div>
+                    <div class="arch-name">ClientHandler</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="section">
+            <h2 class="section-title">Key Features</h2>
+            <ul class="feature-list">
+                <li>TCP socket connection between client and server</li>
+                <li>Multithreaded server handling multiple clients simultaneously</li>
+                <li>Bidirectional data exchange using Input/Output Streams</li>
+                <li>Graceful connection and disconnection management</li>
+                <li>Request-response communication model</li>
+            </ul>
+        </div>
+
+        <!-- Code Snippet -->
+        <div class="section">
+            <h2 class="section-title">Code Snippet — Server</h2>
+            <div class="code-block">
+<pre><span class="code-keyword">public class</span> <span class="code-type">Server</span> {
+    <span class="code-keyword">public static void</span> main(String[] args) <span class="code-keyword">throws</span> IOException {
+        <span class="code-type">ServerSocket</span> serverSocket = <span class="code-keyword">new</span> <span class="code-type">ServerSocket</span>(<span class="code-string">5000</span>);
+        System.out.println(<span class="code-string">"Server listening on port 5000..."</span>);
+
+        <span class="code-keyword">while</span> (<span class="code-keyword">true</span>) {
+            <span class="code-type">Socket</span> client = serverSocket.accept();
+            <span class="code-comment">// Spawn a new thread for each client</span>
+            <span class="code-keyword">new</span> <span class="code-type">Thread</span>(<span class="code-keyword">new</span> <span class="code-type">ClientHandler</span>(client)).start();
+        }
+    }
+}
+
+<span class="code-keyword">class</span> <span class="code-type">ClientHandler</span> <span class="code-keyword">implements</span> <span class="code-type">Runnable</span> {
+    <span class="code-keyword">private final</span> <span class="code-type">Socket</span> socket;
+
+    <span class="code-keyword">public void</span> run() {
+        <span class="code-keyword">try</span> (
+            <span class="code-type">BufferedReader</span> in  = <span class="code-keyword">new</span> <span class="code-type">BufferedReader</span>(<span class="code-keyword">new</span> <span class="code-type">InputStreamReader</span>(socket.getInputStream()));
+            <span class="code-type">PrintWriter</span>    out = <span class="code-keyword">new</span> <span class="code-type">PrintWriter</span>(socket.getOutputStream(), <span class="code-keyword">true</span>)
+        ) {
+            <span class="code-type">String</span> message;
+            <span class="code-keyword">while</span> ((message = in.readLine()) != <span class="code-keyword">null</span>) {
+                System.out.println(<span class="code-string">"Received: "</span> + message);
+                out.println(<span class="code-string">"Echo: "</span> + message);
+            }
+        }
+    }
+}</pre>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>This project deepened my understanding of how distributed systems communicate at the network level. I learned how to manage concurrent connections using Java threads, handle I/O streams reliably, and apply the client-server model — a foundational pattern in distributed computing.</p>
+        </div>
+
+        <!-- Project Navigation -->
+        <div class="project-nav">
+            <a href="projects.html">← All Projects</a>
+            <a href="project-java-rmi.html" class="next">Project 02 — Java RMI →</a>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            navLinks.classList.toggle('open');
+        });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => {
+            hamburger.classList.remove('open');
+            navLinks.classList.remove('open');
+        }));
+    </script>
+</body>
+</html>

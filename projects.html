@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Kawther Bordjiba</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F4E2D1;
+            color: #423736;
+            line-height: 1.6;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(66, 55, 54, 0.95);
+            padding: 0 3rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            color: #D6AA9F;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            font-weight: 400;
+            text-transform: uppercase;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-end;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #F4E2D1;
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            color: #D6AA9F;
+        }
+
+        .nav-cta {
+            padding: 0.45rem 1.2rem;
+            border: 1px solid #D6AA9F;
+            border-radius: 1px;
+            color: #D6AA9F !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 1.5px;
+            transition: all 0.3s !important;
+        }
+
+        .nav-cta:hover {
+            background-color: #D6AA9F;
+            color: #423736 !important;
+        }
+
+        /* ── HAMBURGER (mobile) ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 1.5px;
+            background-color: #F4E2D1;
+            transition: all 0.3s;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 3rem 3rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            color: #423736;
+            letter-spacing: 2px;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #987185;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(152, 113, 133, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .project-card:hover::before {
+            left: 100%;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(66, 55, 54, 0.15);
+            border-color: rgba(152, 113, 133, 0.3);
+        }
+
+        /* Graduation project highlight */
+        .project-card.featured {
+            border-color: rgba(152, 113, 133, 0.25);
+            background-color: rgba(152, 113, 133, 0.08);
+            grid-column: 1 / -1;
+        }
+
+        .project-card.featured:hover {
+            border-color: rgba(152, 113, 133, 0.5);
+        }
+
+        .graduation-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #F4E2D1;
+            background-color: #987185;
+            padding: 0.3rem 0.8rem;
+            border-radius: 1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .project-number {
+            font-size: 0.8rem;
+            color: #987185;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            color: #423736;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .project-card.featured .project-title {
+            font-size: 1.6rem;
+        }
+
+        .project-description {
+            font-size: 0.9rem;
+            color: #423736;
+            opacity: 0.75;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+            background-color: rgba(152, 113, 133, 0.15);
+            color: #987185;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .project-arrow {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            color: #987185;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s;
+        }
+
+        .project-card:hover .project-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: transparent;
+            color: #423736;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border: 1px solid #423736;
+            margin-bottom: 3rem;
+        }
+
+        .back-button:hover {
+            background-color: #423736;
+            color: #F4E2D1;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1.2rem;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(66, 55, 54, 0.98);
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+            }
+
+            nav ul.open {
+                display: flex;
+            }
+
+            nav ul li {
+                width: 100%;
+                text-align: center;
+            }
+
+            nav a {
+                display: block;
+                padding: 0.9rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .nav-cta {
+                margin: 0.5rem 2rem;
+            }
+
+            .container {
+                padding: 6rem 1.5rem 2rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .project-card {
+                padding: 2rem;
+            }
+
+            .project-card.featured {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+
+        <div class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </div>
+
+        <ul id="nav-links">
+            <li><a href="index.html">About Me</a></li>
+            <li><a href="index.html">Education</a></li>
+            <li><a href="index.html">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="index.html" class="back-button">← Back to Portfolio</a>
+
+        <div class="page-header">
+            <h1 class="page-title">My Projects</h1>
+            <p class="page-subtitle">A collection of academic and personal projects showcasing my skills</p>
+        </div>
+
+        <div class="projects-grid">
+
+            <!-- Graduation Project — featured full-width -->
+            <a href="project-graduation.html" class="project-card featured">
+                <div class="graduation-badge">Graduation Project</div>
+                <div class="project-number">Project 11</div>
+                <h2 class="project-title">Design of an Intelligent Dashboard for Managing Group Adaptation in a CSCL Environment</h2>
+                <p class="project-description">A smart dashboard designed to support teachers and facilitators in monitoring and adapting collaborative learning groups within Computer-Supported Collaborative Learning (CSCL) systems. The platform provides real-time analytics and intelligent recommendations to improve group dynamics and learning outcomes.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">Dashboard</span>
+                    <span class="tech-tag">CSCL</span>
+                    <span class="tech-tag">Adaptive Systems</span>
+                    <span class="tech-tag">Data Visualization</span>
+                    <span class="tech-tag">E-Learning</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-java-sockets.html" class="project-card">
+                <div class="project-number">Project 01</div>
+                <h2 class="project-title">Java Sockets</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">Networking</span>
+                    <span class="tech-tag">TCP/IP</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-java-rmi.html" class="project-card">
+                <div class="project-number">Project 02</div>
+                <h2 class="project-title">Java RMI</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">RMI</span>
+                    <span class="tech-tag">Distributed Systems</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-java-corba.html" class="project-card">
+                <div class="project-number">Project 03</div>
+                <h2 class="project-title">Java CORBA</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">CORBA</span>
+                    <span class="tech-tag">Middleware</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-absence-management.html" class="project-card">
+                <div class="project-number">Project 04</div>
+                <h2 class="project-title">Absence Management System</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">Swing GUI</span>
+                    <span class="tech-tag">Database</span>
+                    <span class="tech-tag">SQL</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-dss-website.html" class="project-card">
+                <div class="project-number">Project 05</div>
+                <h2 class="project-title">DSS Website</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">PHP</span>
+                    <span class="tech-tag">SQL</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-hmi-website.html" class="project-card">
+                <div class="project-number">Project 06</div>
+                <h2 class="project-title">Human Machine Interface Website</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">PHP</span>
+                    <span class="tech-tag">SQL</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-store-website.html" class="project-card">
+                <div class="project-number">Project 07</div>
+                <h2 class="project-title">Store Website</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">PHP</span>
+                    <span class="tech-tag">SQL</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-dijkstra.html" class="project-card">
+                <div class="project-number">Project 08</div>
+                <h2 class="project-title">Dijkstra Algorithm Program</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">C</span>
+                    <span class="tech-tag">Graph Algorithms</span>
+                    <span class="tech-tag">Data Structures</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-bellman-ford.html" class="project-card">
+                <div class="project-number">Project 09</div>
+                <h2 class="project-title">Bellman-Ford Algorithm Program</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">C</span>
+                    <span class="tech-tag">Graph Algorithms</span>
+                    <span class="tech-tag">Shortest Path</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+            <a href="project-sorting-algorithms.html" class="project-card">
+                <div class="project-number">Project 10</div>
+                <h2 class="project-title">Sorting Algorithm Program</h2>
+                <div class="project-tech">
+                    <span class="tech-tag">C</span>
+                    <span class="tech-tag">Algorithms</span>
+                    <span class="tech-tag">Complexity Analysis</span>
+                </div>
+                <div class="project-arrow">→</div>
+            </a>
+
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('nav-links');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            navLinks.classList.toggle('open');
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('open');
+                navLinks.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

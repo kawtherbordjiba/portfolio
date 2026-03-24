@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Algorithms - Kawther Bordjiba</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Helvetica Neue', Arial, sans-serif; background-color:#F4E2D1; color:#423736; line-height:1.6; }
+
+        nav { position:fixed; top:0; width:100%; background-color:rgba(66,55,54,0.95); padding:0 3rem; z-index:1000; backdrop-filter:blur(10px); height:60px; display:flex; align-items:center; justify-content:space-between; }
+        .nav-brand { color:#D6AA9F; font-size:1rem; letter-spacing:2px; font-weight:400; text-decoration:none; }
+        nav ul { list-style:none; display:flex; gap:2.5rem; align-items:center; }
+        nav a { color:#F4E2D1; text-decoration:none; font-size:0.85rem; letter-spacing:1px; transition:color 0.3s; white-space:nowrap; }
+        nav a:hover { color:#D6AA9F; }
+        .nav-cta { padding:0.45rem 1.2rem; border:1px solid #D6AA9F; color:#D6AA9F !important; font-size:0.8rem !important; letter-spacing:1.5px; transition:all 0.3s !important; }
+        .nav-cta:hover { background-color:#D6AA9F; color:#423736 !important; }
+        .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+        .hamburger span { display:block; width:22px; height:1.5px; background-color:#F4E2D1; transition:all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity:0; }
+        .hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+
+        .container { max-width:900px; margin:0 auto; padding:8rem 3rem 5rem; }
+        .back-button { display:inline-block; padding:0.8rem 2rem; background-color:transparent; color:#423736; text-decoration:none; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase; transition:all 0.3s; border:1px solid #423736; margin-bottom:3rem; }
+        .back-button:hover { background-color:#423736; color:#F4E2D1; }
+
+        .project-header { margin-bottom:4rem; border-bottom:1px solid rgba(152,113,133,0.2); padding-bottom:3rem; }
+        .project-number { font-size:0.8rem; color:#987185; letter-spacing:3px; text-transform:uppercase; margin-bottom:1rem; }
+        .project-title { font-size:2.8rem; font-weight:300; color:#423736; letter-spacing:1px; margin-bottom:1.5rem; line-height:1.2; }
+        .project-meta { display:flex; flex-wrap:wrap; gap:0.6rem; }
+        .tech-tag { font-size:0.75rem; padding:0.4rem 0.9rem; background-color:rgba(152,113,133,0.15); color:#987185; border-radius:2px; letter-spacing:0.5px; text-transform:uppercase; }
+
+        .section { margin-bottom:3.5rem; }
+        .section-title { font-size:0.85rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:#987185; margin-bottom:1.2rem; }
+        .section p { font-size:1rem; color:#423736; font-weight:300; line-height:1.9; max-width:750px; }
+        code { font-family:'Courier New', monospace; font-size:0.88em; background:rgba(152,113,133,0.1); padding:0.1rem 0.4rem; border-radius:2px; }
+
+        .info-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1.5rem; }
+        .info-card { background-color:rgba(255,255,255,0.2); padding:1.5rem 1.8rem; border-radius:2px; }
+        .info-card .label { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; margin-bottom:0.5rem; }
+        .info-card .value { font-size:0.95rem; color:#423736; font-weight:300; }
+
+        /* Algorithm cards */
+        .algo-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.5rem; }
+        .algo-card { background-color:rgba(255,255,255,0.15); border-radius:2px; padding:1.8rem; border:1px solid transparent; transition:all 0.3s; }
+        .algo-card:hover { border-color:rgba(152,113,133,0.3); transform:translateY(-3px); }
+        .algo-name { font-size:1rem; color:#423736; font-weight:400; margin-bottom:0.5rem; }
+        .algo-complexity { font-family:'Courier New', monospace; font-size:0.82rem; color:#987185; margin-bottom:1rem; }
+        .algo-desc { font-size:0.88rem; color:#423736; font-weight:300; line-height:1.7; }
+
+        /* Complexity table */
+        .complexity-table { width:100%; border-collapse:collapse; }
+        .complexity-table th { font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; color:#987185; font-weight:400; padding:0.8rem 1.2rem; text-align:left; border-bottom:1px solid rgba(152,113,133,0.2); }
+        .complexity-table td { padding:0.75rem 1.2rem; font-size:0.85rem; color:#423736; font-weight:300; font-family:'Courier New', monospace; border-bottom:1px solid rgba(152,113,133,0.08); }
+        .complexity-table tr { background-color:rgba(255,255,255,0.1); }
+        .complexity-table tr:hover { background-color:rgba(255,255,255,0.2); }
+        .good { color:#6a9f78; }
+        .bad  { color:#b07070; }
+
+        /* Tabs for code */
+        .tabs { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:-1px; }
+        .tab-btn { padding:0.55rem 1.1rem; background-color:rgba(255,255,255,0.1); border:1px solid rgba(152,113,133,0.2); border-bottom:none; color:#987185; font-size:0.76rem; letter-spacing:1px; cursor:pointer; font-family:'Courier New', monospace; transition:all 0.2s; border-radius:2px 2px 0 0; }
+        .tab-btn:hover { background-color:rgba(255,255,255,0.2); }
+        .tab-btn.active { background-color:#423736; color:#F4E2D1; border-color:#423736; }
+        .code-panel { display:none; }
+        .code-panel.active { display:block; }
+
+        .code-block { background-color:#423736; border-radius:0 2px 2px 2px; padding:2rem; overflow-x:auto; border:1px solid #423736; }
+        .code-block pre { font-family:'Courier New', monospace; font-size:0.82rem; color:#F4E2D1; line-height:1.75; white-space:pre; }
+        .code-comment { color:#987185; }
+        .code-keyword { color:#D6AA9F; }
+        .code-string { color:#c8a97e; }
+        .code-preproc { color:#c8a97e; }
+
+        .project-nav { display:flex; justify-content:space-between; align-items:center; margin-top:5rem; padding-top:2rem; border-top:1px solid rgba(152,113,133,0.2); flex-wrap:wrap; gap:1rem; }
+        .project-nav a { text-decoration:none; color:#423736; font-size:0.85rem; letter-spacing:1.5px; text-transform:uppercase; transition:color 0.3s; }
+        .project-nav a:hover { color:#987185; }
+        .project-nav .next { margin-left:auto; }
+
+        @media (max-width:768px) {
+            nav { padding:0 1.2rem; }
+            .hamburger { display:flex; }
+            nav ul { display:none; position:absolute; top:60px; left:0; width:100%; background-color:rgba(66,55,54,0.98); flex-direction:column; gap:0; padding:1rem 0; }
+            nav ul.open { display:flex; }
+            nav ul li { width:100%; text-align:center; }
+            nav a { display:block; padding:0.9rem 1.5rem; font-size:0.9rem; }
+            .nav-cta { margin:0.5rem 2rem; }
+            .container { padding:6rem 1.5rem 3rem; }
+            .project-title { font-size:2rem; }
+            .algo-grid { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="nav-brand">KB</a>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+        <ul id="nav-links">
+            <li><a href="index.html">About Me</a></li>
+            <li><a href="index.html">Education</a></li>
+            <li><a href="index.html">Skills</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="index.html" class="nav-cta">Contact Me</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <a href="projects.html" class="back-button">← All Projects</a>
+
+        <div class="project-header">
+            <div class="project-number">Project 10</div>
+            <h1 class="project-title">Sorting Algorithm Program</h1>
+            <div class="project-meta">
+                <span class="tech-tag">C</span>
+                <span class="tech-tag">Algorithms</span>
+                <span class="tech-tag">Complexity Analysis</span>
+                <span class="tech-tag">Divide & Conquer</span>
+                <span class="tech-tag">Recursion</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Overview</h2>
+            <p>A comprehensive C program implementing and comparing five classic sorting algorithms: Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, and Quick Sort. The program accepts an array from the user, runs each algorithm, and displays the sorted output alongside a complexity analysis. This project was designed to build a deep understanding of algorithmic efficiency, recursion, and the practical differences between O(n²) and O(n log n) approaches.</p>
+        </div>
+
+        <div class="section">
+            <div class="info-grid">
+                <div class="info-card"><div class="label">Language</div><div class="value">C</div></div>
+                <div class="info-card"><div class="label">Algorithms</div><div class="value">5 implemented</div></div>
+                <div class="info-card"><div class="label">Best complexity</div><div class="value">O(n log n)</div></div>
+                <div class="info-card"><div class="label">Input</div><div class="value">Terminal / stdin</div></div>
+            </div>
+        </div>
+
+        <!-- Algorithm cards -->
+        <div class="section">
+            <h2 class="section-title">Algorithms Implemented</h2>
+            <div class="algo-grid">
+                <div class="algo-card">
+                    <div class="algo-name">Bubble Sort</div>
+                    <div class="algo-complexity">O(n²) avg — O(n) best</div>
+                    <div class="algo-desc">Repeatedly swaps adjacent elements that are out of order. Simple but inefficient. Optimized with an early-exit flag when no swaps occur in a pass.</div>
+                </div>
+                <div class="algo-card">
+                    <div class="algo-name">Selection Sort</div>
+                    <div class="algo-complexity">O(n²) always</div>
+                    <div class="algo-desc">Finds the minimum element in the unsorted region and places it at the front. Consistent performance regardless of input order. Minimal swaps.</div>
+                </div>
+                <div class="algo-card">
+                    <div class="algo-name">Insertion Sort</div>
+                    <div class="algo-complexity">O(n²) avg — O(n) best</div>
+                    <div class="algo-desc">Builds a sorted sub-array one element at a time. Efficient for nearly sorted data — used by QuickSort as a base case for small partitions.</div>
+                </div>
+                <div class="algo-card">
+                    <div class="algo-name">Merge Sort</div>
+                    <div class="algo-complexity">O(n log n) always</div>
+                    <div class="algo-desc">Divide and conquer — recursively splits the array, then merges sorted halves. Stable sort with guaranteed performance. Requires O(n) extra space.</div>
+                </div>
+                <div class="algo-card">
+                    <div class="algo-name">Quick Sort</div>
+                    <div class="algo-complexity">O(n log n) avg — O(n²) worst</div>
+                    <div class="algo-desc">Partition-based divide and conquer. Selects a pivot and arranges elements into two sub-arrays. Fastest in practice for most inputs. In-place sort.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complexity table -->
+        <div class="section">
+            <h2 class="section-title">Complexity Comparison</h2>
+            <table class="complexity-table">
+                <thead>
+                    <tr><th>Algorithm</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stable</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Bubble Sort</td><td class="good">O(n)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+                    <tr><td>Selection Sort</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td>O(1)</td><td>No</td></tr>
+                    <tr><td>Insertion Sort</td><td class="good">O(n)</td><td class="bad">O(n²)</td><td class="bad">O(n²)</td><td>O(1)</td><td>Yes</td></tr>
+                    <tr><td>Merge Sort</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td>O(n)</td><td>Yes</td></tr>
+                    <tr><td>Quick Sort</td><td class="good">O(n log n)</td><td class="good">O(n log n)</td><td class="bad">O(n²)</td><td>O(log n)</td><td>No</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Code tabs -->
+        <div class="section">
+            <h2 class="section-title">Core Implementations</h2>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('bubble')">Bubble</button>
+                <button class="tab-btn" onclick="showTab('insertion')">Insertion</button>
+                <button class="tab-btn" onclick="showTab('selection')">Selection</button>
+                <button class="tab-btn" onclick="showTab('merge')">Merge</button>
+                <button class="tab-btn" onclick="showTab('quick')">Quick</button>
+            </div>
+
+            <div class="code-panel active" id="tab-bubble">
+                <div class="code-block"><pre><span class="code-comment">/* Bubble Sort — O(n²) avg, O(n) best with early exit */</span>
+<span class="code-keyword">void</span> bubbleSort(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> n) {
+    <span class="code-keyword">int</span> i, j, temp, swapped;
+    <span class="code-keyword">for</span> (i = 0; i &lt; n - 1; i++) {
+        swapped = 0;
+        <span class="code-keyword">for</span> (j = 0; j &lt; n - i - 1; j++) {
+            <span class="code-keyword">if</span> (arr[j] &gt; arr[j + 1]) {
+                <span class="code-comment">/* Swap adjacent elements */</span>
+                temp        = arr[j];
+                arr[j]      = arr[j + 1];
+                arr[j + 1]  = temp;
+                swapped     = 1;
+            }
+        }
+        <span class="code-comment">/* If no swap occurred, array is already sorted */</span>
+        <span class="code-keyword">if</span> (!swapped) <span class="code-keyword">break</span>;
+    }
+}</pre></div>
+            </div>
+
+            <div class="code-panel" id="tab-insertion">
+                <div class="code-block"><pre><span class="code-comment">/* Insertion Sort — O(n²) avg, O(n) best (nearly sorted input) */</span>
+<span class="code-keyword">void</span> insertionSort(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> n) {
+    <span class="code-keyword">int</span> i, key, j;
+    <span class="code-keyword">for</span> (i = 1; i &lt; n; i++) {
+        key = arr[i];
+        j   = i - 1;
+        <span class="code-comment">/* Shift elements greater than key one position right */</span>
+        <span class="code-keyword">while</span> (j &gt;= 0 &amp;&amp; arr[j] &gt; key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;  <span class="code-comment">/* Insert key in correct position */</span>
+    }
+}</pre></div>
+            </div>
+
+            <div class="code-panel" id="tab-selection">
+                <div class="code-block"><pre><span class="code-comment">/* Selection Sort — O(n²) always, minimal swaps */</span>
+<span class="code-keyword">void</span> selectionSort(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> n) {
+    <span class="code-keyword">int</span> i, j, minIdx, temp;
+    <span class="code-keyword">for</span> (i = 0; i &lt; n - 1; i++) {
+        minIdx = i;
+        <span class="code-comment">/* Find the minimum element in unsorted region */</span>
+        <span class="code-keyword">for</span> (j = i + 1; j &lt; n; j++)
+            <span class="code-keyword">if</span> (arr[j] &lt; arr[minIdx]) minIdx = j;
+
+        <span class="code-comment">/* Swap minimum with first element of unsorted region */</span>
+        <span class="code-keyword">if</span> (minIdx != i) {
+            temp         = arr[minIdx];
+            arr[minIdx]  = arr[i];
+            arr[i]       = temp;
+        }
+    }
+}</pre></div>
+            </div>
+
+            <div class="code-panel" id="tab-merge">
+                <div class="code-block"><pre><span class="code-comment">/* Merge Sort — O(n log n) guaranteed, divide and conquer */</span>
+<span class="code-keyword">void</span> merge(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> l, <span class="code-keyword">int</span> m, <span class="code-keyword">int</span> r) {
+    <span class="code-keyword">int</span> n1 = m - l + 1, n2 = r - m;
+    <span class="code-keyword">int</span> L[n1], R[n2], i = 0, j = 0, k = l;
+
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> a = 0; a &lt; n1; a++) L[a] = arr[l + a];
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> b = 0; b &lt; n2; b++) R[b] = arr[m + 1 + b];
+
+    <span class="code-comment">/* Merge the two sorted halves */</span>
+    <span class="code-keyword">while</span> (i &lt; n1 &amp;&amp; j &lt; n2)
+        arr[k++] = (L[i] &lt;= R[j]) ? L[i++] : R[j++];
+    <span class="code-keyword">while</span> (i &lt; n1) arr[k++] = L[i++];
+    <span class="code-keyword">while</span> (j &lt; n2) arr[k++] = R[j++];
+}
+
+<span class="code-keyword">void</span> mergeSort(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> l, <span class="code-keyword">int</span> r) {
+    <span class="code-keyword">if</span> (l &lt; r) {
+        <span class="code-keyword">int</span> m = l + (r - l) / 2;  <span class="code-comment">/* Avoid overflow */</span>
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}</pre></div>
+            </div>
+
+            <div class="code-panel" id="tab-quick">
+                <div class="code-block"><pre><span class="code-comment">/* Quick Sort — O(n log n) avg, O(n²) worst (sorted input) */</span>
+<span class="code-keyword">int</span> partition(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> low, <span class="code-keyword">int</span> high) {
+    <span class="code-keyword">int</span> pivot = arr[high];  <span class="code-comment">/* rightmost element as pivot */</span>
+    <span class="code-keyword">int</span> i = low - 1, temp;
+
+    <span class="code-keyword">for</span> (<span class="code-keyword">int</span> j = low; j &lt; high; j++) {
+        <span class="code-keyword">if</span> (arr[j] &lt; pivot) {
+            i++;
+            temp    = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+        }
+    }
+    <span class="code-comment">/* Place pivot in its correct position */</span>
+    temp        = arr[i + 1];
+    arr[i + 1]  = arr[high];
+    arr[high]   = temp;
+    <span class="code-keyword">return</span> i + 1;
+}
+
+<span class="code-keyword">void</span> quickSort(<span class="code-keyword">int</span> arr[], <span class="code-keyword">int</span> low, <span class="code-keyword">int</span> high) {
+    <span class="code-keyword">if</span> (low &lt; high) {
+        <span class="code-keyword">int</span> pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);   <span class="code-comment">/* Sort left of pivot */</span>
+        quickSort(arr, pi + 1, high);  <span class="code-comment">/* Sort right of pivot */</span>
+    }
+}</pre></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">What I Learned</h2>
+            <p>This project gave me a practical and theoretical grasp of algorithmic complexity. Seeing all five algorithms run on the same input made the difference between O(n²) and O(n log n) concrete — not just on paper. I also deepened my understanding of recursion through Merge Sort and Quick Sort, and learned how to analyze best, average, and worst cases separately. The stability property of sorting algorithms and its implications for real-world use was another key takeaway.</p>
+        </div>
+
+        <div class="project-nav">
+            <a href="project-bellman-ford.html">← Project 09 — Bellman-Ford</a>
+            <a href="project-graduation.html" class="next">Project 11 — Graduation Project →</a>
+        </div>
+    </div>
+
+    <script>
+        function showTab(name) {
+            document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            event.target.classList.add('active');
+        }
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        hamburger.addEventListener('click', () => { hamburger.classList.toggle('open'); navLinks.classList.toggle('open'); });
+        navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('open'); navLinks.classList.remove('open'); }));
+    </script>
+</body>
+</html>
